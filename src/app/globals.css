@@ -1,26 +1,255 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* `light:` variant for the rare light-theme-only tweak. */
+@custom-variant light (&:where([data-theme="light"], [data-theme="light"] *));
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+@theme {
+  --color-bg: #050505;
+  --color-surface: #0e0d0c;
+  --color-surface-2: #171513;
+  --color-line: #2a2622;
+  --color-text: #f2eee8;
+  --color-text-muted: #9c948a;
+  --color-molten: #ff6a13;
+  --color-molten-soft: #ff6a1333;
+  --color-pei: #b8925a;
+  --color-on-molten: #050505;
+  --color-molten-hover: #ff7d33;
+  --color-error: #ff9a5c;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  --font-display: var(--font-archivo), "Archivo", system-ui, sans-serif;
+  --font-body: var(--font-archivo), "Archivo", system-ui, sans-serif;
+  --font-sans: var(--font-body);
+
+  /* Type scale (rem): 0.875 / 1 / 1.25 / 1.5 / 2 / 3 / 4.5 / 7 */
+  /* 7rem is the scale's top step, but Archivo Expanded must fit "your ideas."
+     inside the 5/12 text column, so the hero caps where it fits. */
+  --text-hero: clamp(3rem, 5.2vw, 4.75rem);
+  --text-display: clamp(2.5rem, 1.5rem + 4.4vw, 4.5rem);
+  --text-heading: clamp(2rem, 1.6rem + 1.6vw, 3rem);
+
+  --radius-card: 20px;
+  --radius-input: 12px;
+
+  --animate-spotlight: spotlight 2s ease 0.75s 1 forwards;
+  --animate-layer-print: layer-print 320ms steps(8, end) both;
+  --animate-marquee: marquee 50s linear infinite;
+
+  /* Two identical copies side by side; slide one copy's width (plus half the gap). */
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(calc(-50% - 0.5rem));
+    }
+  }
+
+  @keyframes spotlight {
+    0% {
+      opacity: 0;
+      transform: translate(-72%, -62%) scale(0.5);
+    }
+    100% {
+      opacity: 1;
+      transform: translate(-50%, -40%) scale(1);
+    }
+  }
+
+  /* Bottom-up reveal in 8 horizontal slices, one slice every 40ms. */
+  @keyframes layer-print {
+    from {
+      clip-path: inset(100% 0 0 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+    }
   }
 }
 
+/* Accent glows (bento edge glow, CTA beams). Dark: build-plate bronze. */
+:root {
+  --glow-1: #b8925a;
+  --glow-2: #d8b98a;
+  --glow-3: #8a6a3e;
+}
+
+/*
+ * Light theme: white and molten orange, the daylight mirror of black and
+ * orange. Surfaces carry a faint peach tint, hairlines are warm, and the
+ * secondary accent shifts from bronze to a softer orange.
+ */
+html[data-theme="light"] {
+  --color-bg: #ffffff;
+  --color-surface: #fff8f3;
+  --color-surface-2: #fdefe4;
+  --color-line: #f3dccb;
+  --color-text: #1c1410;
+  --color-text-muted: #6e6057;
+  --color-pei: #f0843f;
+  --color-molten-soft: #ff6a1340;
+  --color-molten-hover: #f25d0a;
+  --color-error: #c2410c;
+  --glow-1: #ff6a13;
+  --glow-2: #ffb27a;
+  --glow-3: #f0843f;
+  color-scheme: light;
+}
+
+html {
+  background: var(--color-bg);
+  color: var(--color-text);
+  color-scheme: dark;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
+  transition:
+    background-color 300ms ease,
+    color 300ms ease;
+  font-family: var(--font-body);
+  font-stretch: 100%;
+  line-height: 1.6;
+  overflow-x: clip;
+}
+
+::selection {
+  background: var(--color-pei);
+  color: var(--color-bg);
+}
+html[data-theme="light"] ::selection {
+  background: var(--color-molten);
+  color: #ffffff;
+}
+
+/* Visible keyboard focus everywhere: molten, 2px offset. */
+:focus-visible {
+  outline: 2px solid var(--color-molten);
+  outline-offset: 2px;
+}
+
+/* Lenis */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* ---------- Typography roles ---------- */
+
+@utility font-display {
+  font-family: var(--font-display);
+  font-stretch: 125%;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 0.95;
+}
+
+@utility font-heading {
+  font-family: var(--font-display);
+  font-stretch: 112%;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  line-height: 1.05;
+}
+
+@utility font-machine {
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  font-stretch: 100%;
+}
+
+@utility prose-body {
+  font-stretch: 100%;
+  font-weight: 400;
+  line-height: 1.6;
+  max-width: 65ch;
+}
+
+/* ---------- Layout ---------- */
+
+@utility container-site {
+  width: 100%;
+  max-width: 1280px;
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+  @media (width >= 48rem) {
+    padding-inline: 2rem;
+  }
+}
+
+@utility section-pad {
+  padding-block: 5rem;
+  @media (width >= 48rem) {
+    padding-block: 8rem;
+  }
+}
+
+/* ---------- Layer motif ---------- */
+
+/* A stack of hairline layer lines, used as a divider. */
+@utility layer-lines {
+  height: 23px;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    var(--color-line) 0 1px,
+    transparent 1px 4.4px
+  );
+}
+
+/* Element starts hidden; the layer-print animation reveals it bottom-up. */
+@utility layer-hidden {
+  clip-path: inset(100% 0 0 0);
+}
+
+/* Following-pointer cursor replaces the native one (mouse only); text
+   fields keep the native caret. */
+html.has-follow-pointer,
+html.has-follow-pointer * {
+  cursor: none !important;
+}
+html.has-follow-pointer :is(input, textarea, select, [contenteditable="true"], [data-cursor="native"]),
+html.has-follow-pointer :is(input, textarea, select, [contenteditable="true"], [data-cursor="native"]) * {
+  cursor: auto !important;
+}
+
+/* Grain reads as dark specks on paper. */
+html[data-theme="light"] .grain {
+  filter: invert(1);
+  mix-blend-mode: multiply;
+  opacity: 0.03;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body {
+    transition: none;
+  }
+  .layer-hidden {
+    clip-path: none !important;
+    animation: none !important;
+  }
+  .animate-spotlight {
+    animation: none !important;
+    opacity: 1;
+    transform: translate(-50%, -40%) scale(1);
+  }
+}
+
+/* Hide scrollbars on horizontal scroll-snap rails. */
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }

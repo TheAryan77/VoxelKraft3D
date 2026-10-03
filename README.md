@@ -1,36 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Voxel Kraft 3D
 
-## Getting Started
+Website for Voxel Kraft 3D, a custom 3D printing studio. Next.js 15 (App Router),
+Tailwind CSS v4, Aceternity UI, React Three Fiber.
 
-First, run the development server:
+## Run locally
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Where things live
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| What | Where |
+|---|---|
+| All copy (headlines, labels, placeholders like `{CITY}`) | `src/content/site.ts` |
+| Work cards (photos, tags, materials) | `src/content/work.ts` + photos in `public/work/` |
+| Founders, reviews, materials, delivery map | `src/content/*.ts` |
+| 3D models | `public/models/*.glb`, registered in `src/lib/models.config.ts` |
+| Model attribution (CC BY) | `src/content/credits.ts` (shown in the footer) |
+| Light/dark colours | `src/app/globals.css` |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Adding a 3D model
 
-## Learn More
+1. Optimise it:
+   ```bash
+   npx gltf-transform optimize input.glb public/models/<slot-id>.glb --compress draco --texture-compress webp
+   ```
+   Helpers: `scripts/strip-nodes.mjs` (remove collider meshes),
+   `scripts/strip-tangents.mjs` (smaller files).
+2. Set `src` for that slot in `src/lib/models.config.ts`. Options per model:
+   `finish` (`"solid"` / `"wireframe"`), `saturation`, `margin` (lower = bigger), `lift`, `rotation`.
+3. If it's CC BY, add it to `src/content/credits.ts`.
 
-To learn more about Next.js, take a look at the following resources:
+A missing or broken model falls back to the placeholder; nothing crashes.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Environment variables
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+See `.env.example`. The quote form emails through Resend when `RESEND_API_KEY`,
+`QUOTE_FROM_EMAIL` and `QUOTE_TO_EMAIL` are set; otherwise requests are only logged.
 
-## Deploy on Vercel
+## Deploying (Vercel)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Import the GitHub repo in Vercel; the defaults (Next.js, `npm run build`) work as is.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Note: Vercel limits request bodies to about 4.5 MB, so quote uploads larger than
+that will fail there. For 50 MB files, upload straight to storage (e.g. Vercel Blob)
+and send the link with the form.
+
+## Before launch
+
+- Replace the `{PLACEHOLDERS}` in `src/content/site.ts` (layer height, materials,
+  turnaround, reply time, city, email, WhatsApp).
+- Replace the demo reviews in `src/content/reviews.ts` with real ones (demo reviews
+  are hidden in production).
+- Fill in sizes and print times in `src/content/work.ts`.
+- Check that every Sketchfab model licence allows commercial web use, and replace
+  trademarked characters (BatMinion, Batman, iPhone) if needed.
