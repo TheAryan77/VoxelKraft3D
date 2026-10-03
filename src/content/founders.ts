@@ -6,7 +6,7 @@
 export const founders = [
   {
     name: "Anurag Mahendru",
-    designation: "Co-founder, design and printing",
+    designation: "Founder",
     src: "/founders/anurag.jpg",
     position: "50% 78%",
     quote:
@@ -14,7 +14,7 @@ export const founders = [
   },
   {
     name: "Aryan",
-    designation: "Co-founder, technology and product",
+    designation: "Co-founder",
     src: "/founders/aryan.jpg",
     quote:
       "My job is to make getting something printed as easy as sending a message. Upload a file, or just describe your idea, and we take it from there. I want Voxel Kraft to feel honest and simple: clear prices, real progress photos and parts that actually get used. If a student, a maker or a small business comes back to us for their second print, we've done our job.",

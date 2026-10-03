@@ -11,7 +11,8 @@ export const PLACEHOLDERS = {
   CITY: "Gurgaon",
   EMAIL: "{EMAIL}",
   INSTAGRAM_URL: "{INSTAGRAM_URL}",
-  WHATSAPP_URL: "{WHATSAPP_URL}",
+  // Anurag: +91 88753 23516
+  WHATSAPP_URL: "https://wa.me/918875323516",
 } as const;
 
 export const site = {
@@ -198,6 +199,8 @@ export const footerCopy = {
     { name: "Email", href: `mailto:${site.contact.email}` },
   ],
   copyright: (year: number) => `© ${year} Voxel Kraft 3D`,
+  instagramLabel: "Voxel Kraft on Instagram",
+  whatsappLabel: "Message Voxel Kraft on WhatsApp",
   creditsLabel: "3D models:",
   creditBy: "by",
   wordmark: "VOXEL KRAFT",
@@ -246,7 +249,7 @@ export const reviewsCopy = {
 
 export const foundersCopy = {
   heading: "From the founders",
-  sub: "Two founders, one printer and a 100-day goal. Here's why we're building Voxel Kraft.",
+  sub: "One printer, a 100-day goal and the two people behind it. Here's why we're building Voxel Kraft.",
   previous: "Previous founder",
   next: "Next founder",
 };
