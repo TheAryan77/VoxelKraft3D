@@ -10,19 +10,26 @@ import { cn } from "@/lib/utils";
 
 /** Instagram's embed renders at 326px wide: a 54px header, then the reel. */
 const EMBED = { width: 326, height: 616, visible: 462 };
-/** Phone swipe-row size: 326 × 0.8 ≈ 260px wide cards. */
-const MOBILE_SCALE = 0.8;
 
 /**
  * Size, position and tilt per reel, newest first. Sizes differ on purpose,
- * like prints of different heights on the bench. Mobile pile, then desktop row.
+ * like prints of different heights on the bench.
  */
 const LAYOUT = [
-  { scale: 1, place: "left-[0%] top-[0%] rotate-[-3deg] md:left-[0%] md:top-[4%]" },
-  { scale: 0.84, place: "left-[8%] top-[21%] rotate-[4deg] md:left-[24%] md:top-[0%]" },
-  { scale: 0.76, place: "left-[2%] top-[40%] rotate-[-2deg] md:left-[44%] md:top-[14%]" },
-  { scale: 0.9, place: "left-[10%] top-[58%] rotate-[3deg] md:left-[60%] md:top-[2%]" },
-  { scale: 0.8, place: "left-[4%] top-[78%] rotate-[-4deg] md:left-[78%] md:top-[12%]" },
+  { scale: 1, place: "left-[0%] top-[4%] rotate-[-3deg]" },
+  { scale: 0.84, place: "left-[24%] top-[0%] rotate-[4deg]" },
+  { scale: 0.76, place: "left-[44%] top-[14%] rotate-[-2deg]" },
+  { scale: 0.9, place: "left-[60%] top-[2%] rotate-[3deg]" },
+  { scale: 0.8, place: "left-[78%] top-[12%] rotate-[-4deg]" },
+];
+
+/** Phone pile: cards zig-zag left and right, each overlapping the one above. */
+const MOBILE_LAYOUT = [
+  { scale: 0.74, place: "left-0 top-0 rotate-[-3deg]" },
+  { scale: 0.68, place: "right-0 top-[11rem] rotate-[4deg]" },
+  { scale: 0.72, place: "left-[2%] top-[22rem] rotate-[-2deg]" },
+  { scale: 0.66, place: "right-[2%] top-[33rem] rotate-[3deg]" },
+  { scale: 0.7, place: "left-[4%] top-[44rem] rotate-[-4deg]" },
 ];
 
 export function Challenge() {
@@ -71,36 +78,25 @@ export function Challenge() {
           </div>
         </div>
 
-        {isMobile ? (
-          <>
-            <p className="mt-8 text-sm text-text-muted">{challengeCopy.swipeHint}</p>
-            {/* Phones: a swipe row, all reels the same size. Dragging a card
-                would fight the page scroll, so there's no pile here. */}
-            <ul className="no-scrollbar -mx-5 mt-4 flex snap-x snap-mandatory scroll-px-5 gap-3 overflow-x-auto px-5 pb-2">
-              {challenge.reels.map((reel) => (
-                <li key={reel.code} className="shrink-0 snap-start rounded-[20px] border border-line bg-surface p-2">
-                  <ReelCard reel={reel} scale={MOBILE_SCALE} />
-                </li>
-              ))}
-            </ul>
-          </>
-        ) : (
-          <>
-            <p className="mt-10 text-sm text-text-muted md:mt-14">{challengeCopy.dragHint}</p>
-            <DraggableCardContainer ref={pileRef} className="relative mt-4 h-[38rem] w-full">
-              {challenge.reels.slice(0, LAYOUT.length).map((reel, i) => {
-                const { scale, place } = LAYOUT[i];
-                return (
-                  <div key={reel.code} className={cn("absolute", place)}>
-                    <DraggableCardBody constraintsRef={pileRef} className="w-auto p-2 md:w-auto">
-                      <ReelCard reel={reel} scale={scale} />
-                    </DraggableCardBody>
-                  </div>
-                );
-              })}
-            </DraggableCardContainer>
-          </>
-        )}
+        <p className="mt-8 text-sm text-text-muted md:mt-14">{isMobile ? challengeCopy.dragHintMobile : challengeCopy.dragHint}</p>
+        {/* A scattered pile of reels. On phones, cards drag by their "Day"
+            strip only, so the page still scrolls and videos stay tappable. */}
+        <DraggableCardContainer ref={pileRef} className="relative mt-4 h-[70rem] w-full md:h-[38rem]">
+          {challenge.reels.slice(0, LAYOUT.length).map((reel, i) => {
+            const { scale, place } = isMobile ? MOBILE_LAYOUT[i] : LAYOUT[i];
+            return (
+              <div key={reel.code} className={cn("absolute", place)}>
+                <DraggableCardBody
+                  constraintsRef={pileRef}
+                  handle={isMobile ? "[data-drag-handle]" : undefined}
+                  className="w-auto p-2 md:w-auto"
+                >
+                  <ReelCard reel={reel} scale={scale} />
+                </DraggableCardBody>
+              </div>
+            );
+          })}
+        </DraggableCardContainer>
       </div>
     </section>
   );
@@ -112,8 +108,8 @@ type Reel = (typeof challenge.reels)[number];
 function ReelCard({ reel, scale }: { reel: Reel; scale: number }) {
   return (
     <>
-      {/* On desktop the label strip is the drag handle; the video stays playable. */}
-      <div className="flex items-center justify-between px-2 pb-2 pt-1" {...cursorProps(cursorCopy.challengeCard)}>
+      {/* The label strip is the drag handle; the video below stays playable. */}
+      <div data-drag-handle className="flex touch-none items-center justify-between px-2 pb-2 pt-1" {...cursorProps(cursorCopy.challengeCard)}>
         <span className="font-heading text-base text-text">{challengeCopy.dayLabel(reel.day)}</span>
         <span className="font-machine text-xs text-text-muted">{reel.date}</span>
       </div>

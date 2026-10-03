@@ -11,22 +11,31 @@ import {
   animate,
   useVelocity,
   useAnimationControls,
+  useDragControls,
 } from "motion/react";
 
 export const DraggableCardBody = ({
   className,
   children,
   constraintsRef,
+  handle,
 }: {
   className?: string;
   children?: React.ReactNode;
   /** Keep the card inside this element instead of the viewport. */
   constraintsRef?: React.RefObject<HTMLElement | null>;
+  /**
+   * CSS selector for a drag handle inside the card. When set, only the handle
+   * starts a drag, so touching the rest of the card scrolls the page (phones)
+   * and embedded content stays tappable.
+   */
+  handle?: string;
 }) => {
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
   const cardRef = useRef<HTMLDivElement>(null);
   const controls = useAnimationControls();
+  const dragControls = useDragControls();
   const [constraints, setConstraints] = useState({
     top: 0,
     left: 0,
@@ -113,6 +122,11 @@ export const DraggableCardBody = ({
     <motion.div
       ref={cardRef}
       drag
+      dragControls={dragControls}
+      dragListener={!handle}
+      onPointerDown={(e) => {
+        if (handle && (e.target as Element).closest(handle)) dragControls.start(e);
+      }}
       dragConstraints={constraintsRef ?? constraints}
       dragElastic={0.18}
       onDragEnd={(event, info) => {
@@ -164,7 +178,9 @@ export const DraggableCardBody = ({
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       className={cn(
-        "relative w-64 touch-none overflow-hidden rounded-[20px] border border-line bg-surface p-3 shadow-[0_24px_60px_-28px_rgba(0,0,0,0.55)] transform-3d md:w-72",
+        "relative w-64 overflow-hidden rounded-[20px]",
+        !handle && "touch-none",
+        " border border-line bg-surface p-3 shadow-[0_24px_60px_-28px_rgba(0,0,0,0.55)] transform-3d md:w-72",
         className,
       )}
     >

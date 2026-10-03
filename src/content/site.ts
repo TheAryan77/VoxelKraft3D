@@ -130,7 +130,7 @@ export const challengeCopy = {
   progress: (day: number, total: number) => `Day ${day} of ${total}`,
   follow: "Follow the journey on Instagram",
   dragHint: "Drag the reels around. Tap one to play.",
-  swipeHint: "Swipe through the latest days. Tap one to play.",
+  dragHintMobile: "Drag a reel by its Day label to move it. Tap a video to play.",
   dayLabel: (day: number) => `Day ${day}`,
   reelTitle: (day: number) => `Day ${day} of the 100-day challenge, on Instagram`,
 };
