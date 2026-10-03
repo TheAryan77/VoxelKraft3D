@@ -50,9 +50,10 @@ export const hero = {
   secondaryCta: { label: "See our work", href: "#work" },
   /** Real specs of the printer. */
   machineData: [
-    { value: PLACEHOLDERS.LAYER_HEIGHT, label: "Layer height" },
-    { value: PLACEHOLDERS.MATERIALS, label: "Materials" },
-    { value: PLACEHOLDERS.TURNAROUND, label: "Turnaround" },
+    // Provisional values — confirm with the printer settings (Bambu Lab P2S).
+    { value: "From 0.08 mm", label: "Layer height" },
+    { value: "PLA, PETG, ABS, TPU", label: "Materials" },
+    { value: "2–4 days", label: "Turnaround" },
   ],
 };
 
