@@ -10,7 +10,7 @@ import { ModelSlot } from "@/components/three/ModelSlot";
 import { cursorCopy, hero } from "@/content/site";
 import { heroCtaVisible, heroPrintStart, startHeroPrint } from "@/lib/sceneStore";
 import { useStore } from "@/lib/store";
-import { useReducedMotion } from "@/lib/useReducedMotion";
+import { useIsMobile, useReducedMotion } from "@/lib/useReducedMotion";
 import { cn } from "@/lib/utils";
 
 /** If the 3D scene isn't ready by then, the headline starts on its own. */
@@ -21,6 +21,8 @@ const LINE_GAP_MS = 90;
 const LEAD_IN_MS = 120;
 /** Hero model fills more of its stage and sits a little higher. */
 const HERO_FRAMING = { margin: 0.94, lift: 0.07 };
+/** On phones the stage is short and wide, so the castle fills the width. */
+const HERO_FRAMING_MOBILE = { margin: 0.9, lift: 0.02 };
 /** The 3D area reaches past the stage (under the headline, to the page edge). */
 // Shifted right on wide screens; narrower screens keep less room on the right
 // so the spinning castle never touches the screen edge.
@@ -30,6 +32,7 @@ const HERO_BLEED =
 export function Hero() {
   const started = useStore(heroPrintStart, null) !== null;
   const reduced = useReducedMotion();
+  const isMobile = useIsMobile();
   const [headlineDone, setHeadlineDone] = useState(false);
   const ctaRef = useRef<HTMLDivElement>(null);
 
@@ -63,19 +66,19 @@ export function Hero() {
   return (
     <section aria-labelledby="hero-heading" className="relative overflow-x-clip" {...cursorProps(cursorCopy.hero)}>
       <div aria-hidden className="pointer-events-none absolute inset-0 opacity-50 light:opacity-80">
-        <Spotlight className="-top-40 left-0 md:-top-32 md:left-[12%]" fill="#FF6A13" />
+        <Spotlight className="-top-40 -left-24 md:-top-32 md:left-[12%]" fill="#FF6A13" />
       </div>
 
-      <div className="container-site relative grid min-h-[100svh] grid-cols-1 content-center gap-8 pb-10 pt-24 md:grid-cols-12 md:gap-x-6 md:gap-y-4 md:pt-28">
+      <div className="container-site relative grid min-h-[100svh] grid-cols-1 content-center gap-5 pb-8 pt-20 md:grid-cols-12 md:gap-8 md:pb-10 md:gap-x-6 md:gap-y-4 md:pt-28">
         {/* Model stage: above the text on mobile, 7/12 on desktop. No radius. */}
-        <div {...cursorProps(cursorCopy.heroModel)} className="relative h-[64vh] md:col-span-7 md:col-start-6 md:row-start-1 md:-mr-6 md:-mt-14 md:h-[min(86vh,840px)] lg:-mr-12">
+        <div {...cursorProps(cursorCopy.heroModel)} className="relative h-[42svh] min-h-[280px] md:min-h-0 md:col-span-7 md:col-start-6 md:row-start-1 md:-mr-6 md:-mt-14 md:h-[min(86vh,840px)] lg:-mr-12">
           <BuildPlate />
           <ModelSlot
             id="hero-print"
             mode="print-reveal"
             hotend
             parallax
-            framing={HERO_FRAMING}
+            framing={isMobile ? HERO_FRAMING_MOBILE : HERO_FRAMING}
             bleed={HERO_BLEED}
             className="absolute inset-0"
           />
@@ -100,13 +103,13 @@ export function Hero() {
           <TextGenerateEffect
             words={hero.subline}
             play={showRest}
-            className="mt-6 max-w-[34ch] text-lg leading-relaxed md:text-xl"
+            className="mt-4 max-w-[34ch] text-base leading-relaxed md:mt-6 md:text-xl"
           />
 
           <div
             ref={ctaRef}
             className={cn(
-              "mt-10 flex flex-wrap items-center gap-x-8 gap-y-4 transition-opacity duration-700",
+              "mt-7 flex flex-wrap items-center gap-x-8 gap-y-4 transition-opacity duration-700 md:mt-10",
               showRest ? "opacity-100" : "opacity-0",
             )}
           >
@@ -118,14 +121,14 @@ export function Hero() {
         {/* Machine-data strip */}
         <dl
           className={cn(
-            "col-span-full mt-4 grid grid-cols-1 gap-4 border-t border-line pt-6 sm:grid-cols-3 md:row-start-2 transition-opacity delay-300 duration-700",
+            "col-span-full mt-2 grid grid-cols-3 gap-3 border-t border-line pt-5 md:mt-4 md:gap-4 md:pt-6 md:row-start-2 transition-opacity delay-300 duration-700",
             showRest ? "opacity-100" : "opacity-0",
           )}
         >
           {hero.machineData.map((item) => (
             <div key={item.label} className="flex flex-col gap-1">
-              <dt className="text-xs text-text-muted">{item.label}</dt>
-              <dd className="font-machine text-sm text-text">{item.value}</dd>
+              <dt className="text-[11px] text-text-muted md:text-xs">{item.label}</dt>
+              <dd className="font-machine break-words text-xs text-text md:text-sm">{item.value}</dd>
             </div>
           ))}
         </dl>

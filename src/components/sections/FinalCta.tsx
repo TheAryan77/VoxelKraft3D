@@ -17,7 +17,7 @@ export function FinalCta() {
         dim={0.65}
         className="pointer-events-none absolute left-1/2 top-1/2 -ml-[min(45vw,310px)] -mt-[min(45vw,310px)] h-[min(90vw,620px)] w-[min(90vw,620px)]"
       />
-      <div className="container-site relative z-40 flex flex-col items-center py-12 text-center md:py-20">
+      <div className="container-site relative z-40 flex flex-col items-center py-6 text-center md:py-20">
         <h2 id="cta-heading" className="font-display text-[length:var(--text-display)] text-text">
           {ctaCopy.headline.map((line) => (
             <span key={line} className="block">

@@ -108,8 +108,11 @@ export default function WorldMap({
                 <text
                   x={p.x + 6}
                   y={p.y - 6}
-                  className={cn("font-machine", isOrigin ? "fill-text" : "fill-text-muted")}
-                  style={{ fontSize: isOrigin ? 11 : 9 }}
+                  // Font size is in map units; bigger on phones, where the map is drawn smaller.
+                  className={cn(
+                    "font-machine",
+                    isOrigin ? "fill-text text-[17px] md:text-[11px]" : "fill-text-muted text-[14px] md:text-[9px]",
+                  )}
                 >
                   {point.label}
                 </text>

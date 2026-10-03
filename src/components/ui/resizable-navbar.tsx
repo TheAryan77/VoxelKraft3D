@@ -126,7 +126,7 @@ export const MobileNav = ({ children, className, visible }: MobileNavProps) => {
       animate={{ height: visible ? 60 : 72, y: visible ? 10 : 0 }}
       transition={spring}
       className={cn(
-        "relative z-50 mx-auto flex w-[calc(100%-1.5rem)] flex-col justify-center rounded-full border px-3 lg:hidden",
+        "relative z-[70] mx-auto flex w-[calc(100%-1.5rem)] flex-col justify-center rounded-full border px-3 lg:hidden",
         "border-transparent bg-transparent transition-[background-color,border-color] duration-300",
         visible && "border-line bg-surface/70 backdrop-blur-md",
         className,

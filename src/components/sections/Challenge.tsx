@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import { useIsMobile } from "@/lib/useReducedMotion";
 import { DraggableCardBody, DraggableCardContainer } from "@/components/ui/draggable-card";
 import { challenge } from "@/content/challenge";
 import { challengeCopy, cursorCopy } from "@/content/site";
@@ -9,6 +10,8 @@ import { cn } from "@/lib/utils";
 
 /** Instagram's embed renders at 326px wide: a 54px header, then the reel. */
 const EMBED = { width: 326, height: 616, visible: 462 };
+/** Phone swipe-row size: 326 × 0.8 ≈ 260px wide cards. */
+const MOBILE_SCALE = 0.8;
 
 /**
  * Size, position and tilt per reel, newest first. Sizes differ on purpose,
@@ -24,6 +27,7 @@ const LAYOUT = [
 
 export function Challenge() {
   const pileRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
   const latest = challenge.reels[0]?.day ?? 0;
   const pct = Math.min(100, (latest / challenge.totalDays) * 100);
 
@@ -67,40 +71,65 @@ export function Challenge() {
           </div>
         </div>
 
-        <p className="mt-10 text-sm text-text-muted md:mt-14">{challengeCopy.dragHint}</p>
-        <DraggableCardContainer ref={pileRef} className="relative mt-4 h-[124rem] w-full md:h-[38rem]">
-          {challenge.reels.slice(0, LAYOUT.length).map((reel, i) => {
-            const { scale, place } = LAYOUT[i];
-            return (
-              <div key={reel.code} className={cn("absolute", place)}>
-                <DraggableCardBody constraintsRef={pileRef} className="w-auto p-2 md:w-auto">
-                  {/* Drag by the label strip; the video below stays playable. */}
-                  <div className="flex items-center justify-between px-2 pb-2 pt-1" {...cursorProps(cursorCopy.challengeCard)}>
-                    <span className="font-heading text-base text-text">{challengeCopy.dayLabel(reel.day)}</span>
-                    <span className="font-machine text-xs text-text-muted">{reel.date}</span>
+        {isMobile ? (
+          <>
+            <p className="mt-8 text-sm text-text-muted">{challengeCopy.swipeHint}</p>
+            {/* Phones: a swipe row, all reels the same size. Dragging a card
+                would fight the page scroll, so there's no pile here. */}
+            <ul className="no-scrollbar -mx-5 mt-4 flex snap-x snap-mandatory scroll-px-5 gap-3 overflow-x-auto px-5 pb-2">
+              {challenge.reels.map((reel) => (
+                <li key={reel.code} className="shrink-0 snap-start rounded-[20px] border border-line bg-surface p-2">
+                  <ReelCard reel={reel} scale={MOBILE_SCALE} />
+                </li>
+              ))}
+            </ul>
+          </>
+        ) : (
+          <>
+            <p className="mt-10 text-sm text-text-muted md:mt-14">{challengeCopy.dragHint}</p>
+            <DraggableCardContainer ref={pileRef} className="relative mt-4 h-[38rem] w-full">
+              {challenge.reels.slice(0, LAYOUT.length).map((reel, i) => {
+                const { scale, place } = LAYOUT[i];
+                return (
+                  <div key={reel.code} className={cn("absolute", place)}>
+                    <DraggableCardBody constraintsRef={pileRef} className="w-auto p-2 md:w-auto">
+                      <ReelCard reel={reel} scale={scale} />
+                    </DraggableCardBody>
                   </div>
-                  <div
-                    className="overflow-hidden rounded-[12px] bg-surface-2"
-                    style={{ width: EMBED.width * scale, height: EMBED.visible * scale }}
-                  >
-                    <iframe
-                      src={`https://www.instagram.com/reel/${reel.code}/embed/`}
-                      title={challengeCopy.reelTitle(reel.day)}
-                      width={EMBED.width}
-                      height={EMBED.height}
-                      loading="lazy"
-                      scrolling="no"
-                      allow="autoplay; encrypted-media; picture-in-picture; clipboard-write"
-                      className="block border-0"
-                      style={{ transform: `scale(${scale})`, transformOrigin: "0 0" }}
-                    />
-                  </div>
-                </DraggableCardBody>
-              </div>
-            );
-          })}
-        </DraggableCardContainer>
+                );
+              })}
+            </DraggableCardContainer>
+          </>
+        )}
       </div>
     </section>
+  );
+}
+
+type Reel = (typeof challenge.reels)[number];
+
+/** Day label strip plus the Instagram embed, scaled to `scale`. */
+function ReelCard({ reel, scale }: { reel: Reel; scale: number }) {
+  return (
+    <>
+      {/* On desktop the label strip is the drag handle; the video stays playable. */}
+      <div className="flex items-center justify-between px-2 pb-2 pt-1" {...cursorProps(cursorCopy.challengeCard)}>
+        <span className="font-heading text-base text-text">{challengeCopy.dayLabel(reel.day)}</span>
+        <span className="font-machine text-xs text-text-muted">{reel.date}</span>
+      </div>
+      <div className="overflow-hidden rounded-[12px] bg-surface-2" style={{ width: EMBED.width * scale, height: EMBED.visible * scale }}>
+        <iframe
+          src={`https://www.instagram.com/reel/${reel.code}/embed/`}
+          title={challengeCopy.reelTitle(reel.day)}
+          width={EMBED.width}
+          height={EMBED.height}
+          loading="lazy"
+          scrolling="no"
+          allow="autoplay; encrypted-media; picture-in-picture; clipboard-write"
+          className="block border-0"
+          style={{ transform: `scale(${scale})`, transformOrigin: "0 0" }}
+        />
+      </div>
+    </>
   );
 }

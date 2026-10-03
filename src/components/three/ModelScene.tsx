@@ -168,12 +168,12 @@ function Rig({
       <group ref={tilt}>
         {printReveal ? (
           <PrintReveal visible={visible} hotend={hotend}>
-            <Fitted spin={spin} entry={entry} onCentered={onCentered} element={element} onRefit={onRefit} framing={framing} envelope={envelope}>
+            <Fitted spin={spin} entry={entry} onCentered={onCentered} element={element} onRefit={onRefit} framing={framing} envelope={envelope} isMobile={isMobile}>
               {model}
             </Fitted>
           </PrintReveal>
         ) : (
-          <Fitted spin={spin} entry={entry} onCentered={onCentered} element={element} onRefit={onRefit} framing={framing} envelope={envelope}>
+          <Fitted spin={spin} entry={entry} onCentered={onCentered} element={element} onRefit={onRefit} framing={framing} envelope={envelope} isMobile={isMobile}>
             {model}
           </Fitted>
         )}
@@ -203,6 +203,7 @@ function Fitted({
   onRefit,
   framing,
   envelope,
+  isMobile,
   children,
 }: {
   spin: React.RefObject<THREE.Group | null>;
@@ -212,6 +213,7 @@ function Fitted({
   onRefit: () => void;
   framing?: Framing;
   envelope: SpinEnvelope | null;
+  isMobile: boolean;
   children: ReactNode;
 }) {
   return (
@@ -221,8 +223,8 @@ function Fitted({
       <RefitOnResize
         element={element}
         onRefit={onRefit}
-        margin={framing?.margin ?? entry.margin}
-        lift={framing?.lift ?? entry.lift}
+        margin={framing?.margin ?? (isMobile ? entry.mobileMargin : undefined) ?? entry.margin}
+        lift={framing?.lift ?? (isMobile ? entry.mobileLift : undefined) ?? entry.lift}
         envelope={envelope}
       />
       <group ref={spin}>

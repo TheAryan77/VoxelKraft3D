@@ -52,7 +52,7 @@ export function Work({ photos }: { photos: Record<string, boolean> }) {
                 triggerRef.current = e.currentTarget;
                 setActive(item);
               }}
-              className="group relative block w-full overflow-hidden rounded-[20px] border border-line bg-surface text-left transition-colors hover:border-pei/40"
+              className="group relative block w-full overflow-hidden rounded-[16px] border border-line bg-surface text-left transition-colors hover:border-pei/40 sm:rounded-[20px]"
               aria-haspopup="dialog"
             >
               <motion.div layoutId={`image-${item.slug}-${id}`}>
@@ -64,17 +64,17 @@ export function Work({ photos }: { photos: Record<string, boolean> }) {
                 />
               </motion.div>
               {item.tags?.length ? (
-                <div className="absolute left-4 top-4 z-10 flex flex-wrap gap-1.5">
+                <div className="absolute left-2 top-2 z-10 flex flex-wrap gap-1 sm:left-4 sm:top-4 sm:gap-1.5">
                   {item.tags.map((t) => (
                     <TagBadge key={t} label={t} />
                   ))}
                 </div>
               ) : null}
-              <div className="flex flex-col gap-1 p-5">
-                <motion.h3 layoutId={`title-${item.slug}-${id}`} className="font-heading text-lg text-text">
+              <div className="flex flex-col gap-1 p-3 sm:p-5">
+                <motion.h3 layoutId={`title-${item.slug}-${id}`} className="font-heading text-sm leading-snug text-text sm:text-lg">
                   {item.title}
                 </motion.h3>
-                <p className="flex gap-4 font-machine text-sm text-text-muted">
+                <p className="flex flex-wrap gap-x-3 gap-y-0.5 font-machine text-[11px] text-text-muted sm:gap-4 sm:text-sm">
                   <span>{item.material}</span>
                   <span>{item.printTime}</span>
                 </p>
@@ -161,11 +161,11 @@ function WorkModal({
         aria-labelledby={titleId}
         onKeyDown={onKeyDown}
         data-lenis-prevent
-        className="relative grid h-full w-full max-w-5xl grid-cols-1 overflow-y-auto bg-surface md:h-auto md:max-h-[88vh] md:grid-cols-2 md:overflow-hidden md:rounded-[20px] md:border md:border-line"
+        className="relative grid h-full w-full max-w-5xl grid-cols-1 content-start overflow-y-auto bg-surface md:content-stretch md:h-auto md:max-h-[88vh] md:grid-cols-2 md:overflow-hidden md:rounded-[20px] md:border md:border-line"
       >
         <motion.div layoutId={`image-${item.slug}-${id}`} className="relative">
           {hasModel ? (
-            <div {...cursorProps(cursorCopy.workModel)} className="relative aspect-square w-full bg-surface-2 md:h-full md:aspect-auto md:min-h-[520px]">
+            <div {...cursorProps(cursorCopy.workModel)} className="relative aspect-[4/3] w-full bg-surface-2 md:h-full md:aspect-auto md:min-h-[520px]">
               <ModelSlot id={item.modelId} interactive layer="modal" className="absolute inset-0" />
               <p className="pointer-events-none absolute bottom-4 left-4 text-xs text-text-muted">{workCopy.orbitHint}</p>
             </div>
@@ -176,12 +176,12 @@ function WorkModal({
               available={photoAvailable}
               reveal={false}
               sizes="(min-width: 768px) 50vw, 100vw"
-              className="aspect-[4/5] w-full md:aspect-auto md:h-full md:min-h-[520px]"
+              className="aspect-[4/3] w-full md:aspect-auto md:h-full md:min-h-[520px]"
             />
           )}
         </motion.div>
 
-        <div className="flex flex-col gap-6 p-6 md:p-10">
+        <div className="flex flex-col gap-5 p-5 md:gap-6 md:p-10">
           <div className="flex items-start justify-between gap-4">
             <div className="flex flex-col items-start gap-3">
               {item.tags?.length ? (
@@ -191,7 +191,7 @@ function WorkModal({
                   ))}
                 </div>
               ) : null}
-              <motion.h3 id={titleId} layoutId={`title-${item.slug}-${id}`} className="font-heading text-3xl text-text">
+              <motion.h3 id={titleId} layoutId={`title-${item.slug}-${id}`} className="font-heading text-2xl text-text md:text-3xl">
                 {item.title}
               </motion.h3>
             </div>
@@ -200,7 +200,7 @@ function WorkModal({
               type="button"
               onClick={onClose}
               aria-label={workCopy.close}
-              className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-line text-text-muted transition hover:border-pei/50 hover:text-text active:scale-[0.97]"
+              className="absolute right-3 top-3 z-20 grid h-10 w-10 shrink-0 place-items-center rounded-full border border-line bg-bg/70 text-text backdrop-blur-sm transition hover:border-pei/50 hover:text-text active:scale-[0.97] md:static md:bg-transparent md:text-text-muted md:backdrop-blur-none"
             >
               <IconX size={18} />
             </button>
@@ -208,7 +208,7 @@ function WorkModal({
 
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col gap-6">
             <p className="prose-body text-text-muted">{item.description}</p>
-            <dl className="grid grid-cols-1 gap-4 border-y border-line py-5 sm:grid-cols-3">
+            <dl className="grid grid-cols-3 gap-3 border-y border-line py-4 md:gap-4 md:py-5">
               {[
                 [workCopy.materialLabel, item.material],
                 [workCopy.sizeLabel, item.size],
@@ -239,7 +239,7 @@ function TagBadge({ label, className }: { label: string; className?: string }) {
   return (
     <span
       className={cn(
-        "z-10 inline-flex items-center gap-1.5 rounded-full bg-molten px-3 py-1 text-xs font-semibold text-on-molten",
+        "z-10 inline-flex items-center gap-1 rounded-full bg-molten px-2 py-0.5 text-[10px] font-semibold text-on-molten sm:gap-1.5 sm:px-3 sm:py-1 sm:text-xs",
         className,
       )}
     >

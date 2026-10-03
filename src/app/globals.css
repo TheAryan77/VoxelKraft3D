@@ -190,7 +190,7 @@ html.lenis body {
 }
 
 @utility section-pad {
-  padding-block: 5rem;
+  padding-block: 4rem;
   @media (width >= 48rem) {
     padding-block: 8rem;
   }

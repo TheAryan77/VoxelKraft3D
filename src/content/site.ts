@@ -60,6 +60,7 @@ export const servicesCopy = {
   heading: "What we make",
   sub: "From a single prototype to a small batch.",
   askLabel: "Ask about this",
+  swipeHint: "Swipe to see all five.",
 };
 
 export const workCopy = {
@@ -129,6 +130,7 @@ export const challengeCopy = {
   progress: (day: number, total: number) => `Day ${day} of ${total}`,
   follow: "Follow the journey on Instagram",
   dragHint: "Drag the reels around. Tap one to play.",
+  swipeHint: "Swipe through the latest days. Tap one to play.",
   dayLabel: (day: number) => `Day ${day}`,
   reelTitle: (day: number) => `Day ${day} of the 100-day challenge, on Instagram`,
 };
@@ -250,5 +252,6 @@ export const foundersCopy = {
 export const deliveryCopy = {
   heading: "Printed here, delivered anywhere",
   sub: `Every order leaves our workshop in ${PLACEHOLDERS.CITY}, packed and tracked. Pickup is free.`,
+  swipeHint: "Swipe the map to see where we ship.",
   mapLabel: `Map of delivery routes from ${PLACEHOLDERS.CITY} to customers around the world.`,
 };

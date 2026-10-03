@@ -57,7 +57,7 @@ export const FileUpload = ({
       <motion.div
         whileHover="animate"
         className={cn(
-          "group/file relative block w-full overflow-hidden rounded-[20px] border bg-surface p-8 transition-colors md:p-10",
+          "group/file relative block w-full overflow-hidden rounded-[20px] border bg-surface p-6 transition-colors md:p-10",
           "has-[input:focus-visible]:outline-2 has-[input:focus-visible]:outline-offset-2 has-[input:focus-visible]:outline-molten has-[input:focus-visible]:outline",
           isDragActive ? "border-pei" : invalid ? "border-molten/70" : "border-line hover:border-pei/50",
         )}
@@ -84,7 +84,7 @@ export const FileUpload = ({
           </label>
           <p className="mt-2 max-w-[42ch] text-sm text-text-muted">{copy.hint}</p>
           <p className="mt-1 max-w-[42ch] text-sm text-text-muted">{copy.photoHint}</p>
-          <div className="relative mt-8 w-full">
+          <div className="relative mt-6 w-full md:mt-8">
             {file ? (
               <motion.div
                 layoutId="file-upload"

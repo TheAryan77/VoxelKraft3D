@@ -36,6 +36,9 @@ export interface ModelEntry {
   margin?: number;
   /** Raise (+) or lower (−) the model in its slot, as a fraction of slot height. */
   lift?: number;
+  /** Phone-width overrides (slots are a different shape there). */
+  mobileMargin?: number;
+  mobileLift?: number;
   rotation?: [number, number, number];
   autoRotate?: boolean;
   /**
@@ -55,7 +58,7 @@ export const MODELS: Record<ModelSlotId, ModelEntry> = {
   "hero-print":            { src: "/models/hero-print.glb", placeholder: "vase", autoRotate: true, saturation: 0.12, finish: "wireframe", label: "Hero signature print" },
   "hotend":                { src: null, placeholder: "nozzle",   label: "Printer nozzle / hotend (optional)" },
   // "Mercedes car" by funkyJeans on Sketchfab (CC BY 4.0, credited in the footer). 308k -> 53k triangles. Angled to a 3/4 view.
-  "service-prototype":     { src: "/models/service-prototype-car.glb", finish: "wireframe", placeholder: "box", autoRotate: true, rotation: [0, 0.85, 0], margin: 0.44, lift: 0.08, label: "Service: Prototyping" },
+  "service-prototype":     { src: "/models/service-prototype-car.glb", finish: "wireframe", placeholder: "box", autoRotate: true, rotation: [0, 0.85, 0], margin: 0.44, lift: 0.08, mobileMargin: 0.7, mobileLift: 0.03, label: "Service: Prototyping" },
   // "Human face" by thunk3d.scanner on Sketchfab (CC BY 4.0, credited in the footer). Simplified from 804k to 56k triangles.
   "service-custom":        { src: "/models/service-custom.glb", finish: "wireframe", placeholder: "figure", autoRotate: true, margin: 0.82, label: "Service: Custom models" },
   // "Steampunk Gear" by Darren McNerney 3D on Sketchfab (CC BY 4.0, credited in the footer). Turned 90° to face the camera.

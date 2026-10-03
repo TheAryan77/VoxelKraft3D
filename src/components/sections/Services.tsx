@@ -16,8 +16,10 @@ export function Services() {
   return (
     <section id="services" aria-labelledby="services-heading" className="section-pad" {...cursorProps(cursorCopy.services)}>
       <div className="container-site">
-        <SectionHeading id="services-heading" title={servicesCopy.heading} sub={servicesCopy.sub} />
-        <BentoGrid>
+        <SectionHeading id="services-heading" title={servicesCopy.heading} sub={servicesCopy.sub} className="mb-8 md:mb-16" />
+        <p className="mb-4 text-sm text-text-muted md:hidden">{servicesCopy.swipeHint}</p>
+        {/* Phones: a swipe row with the next tile peeking in. Desktop: the bento grid. */}
+        <BentoGrid className="no-scrollbar -mx-5 flex snap-x snap-mandatory scroll-px-5 overflow-x-auto px-5 pb-2 md:mx-0 md:grid md:overflow-visible md:px-0 md:pb-0">
           {services.map((service) => (
             <ServiceTile key={service.id} service={service} />
           ))}
@@ -33,7 +35,7 @@ function ServiceTile({ service }: { service: Service }) {
 
   return (
     <BentoGridItem
-      className={cn(service.span === 2 && "md:col-span-2")}
+      className={cn("w-[82vw] max-w-[340px] shrink-0 snap-start md:w-auto md:max-w-none", service.span === 2 && "md:col-span-2")}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onFocus={() => setHovered(true)}
@@ -52,7 +54,7 @@ function ServiceTile({ service }: { service: Service }) {
           <ModelSlot
             id={service.modelId}
             active={hovered}
-            className="h-[16rem] w-full shrink-0 overflow-hidden rounded-[14px] bg-surface-2/60 md:h-[65%]"
+            className="h-[15rem] w-full shrink-0 overflow-hidden rounded-[14px] bg-surface-2/60 md:h-[65%]"
           />
         </>
       }

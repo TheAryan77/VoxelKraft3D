@@ -48,8 +48,8 @@ export const AnimatedTestimonials = ({
   const current = testimonials[active];
 
   return (
-    <div className="grid grid-cols-1 items-center gap-12 md:grid-cols-2 md:gap-20">
-      <div className="relative mx-auto aspect-square w-full max-w-[420px]">
+    <div className="grid grid-cols-1 items-center gap-8 md:grid-cols-2 md:gap-20">
+      <div className="relative mx-auto aspect-[4/3] w-full max-w-[420px] md:aspect-square">
         <AnimatePresence>
           {testimonials.map((t, index) => {
             const isActive = index === active;
@@ -93,7 +93,7 @@ export const AnimatedTestimonials = ({
         </AnimatePresence>
       </div>
 
-      <div className="flex flex-col gap-10">
+      <div className="flex flex-col gap-6 md:gap-10">
         <motion.figure
           key={active}
           initial={{ y: reduced ? 0 : 16, opacity: 0 }}
@@ -105,7 +105,7 @@ export const AnimatedTestimonials = ({
             <p className="font-heading text-2xl text-pei">{current.name}</p>
             <p className="mt-1 text-sm text-text-muted">{current.designation}</p>
           </figcaption>
-          <blockquote className="prose-body mt-8 text-lg leading-relaxed text-text md:text-xl">
+          <blockquote className="prose-body mt-5 text-base leading-relaxed text-text md:mt-8 md:text-xl">
             {current.quote.split(" ").map((word, index) => (
               <motion.span
                 key={index}
