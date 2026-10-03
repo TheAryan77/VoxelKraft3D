@@ -1,8 +1,8 @@
 /**
- * DEMO REVIEWS — placeholders to show the layout. Replace them with real
- * customer quotes (with permission) before launch. Entries marked `demo: true`
- * are hidden on the live (production) site unless
- * NEXT_PUBLIC_SHOW_DEMO_REVIEWS=true, so invented reviews can't go live by accident.
+ * SAMPLE REVIEWS — placeholders to show the layout. Replace them with real
+ * customer quotes (with permission). While any entry is marked `demo: true`,
+ * the section shows a visible "sample reviews" note so nobody mistakes them
+ * for real customers. Remove `demo: true` from real reviews.
  */
 export interface Review {
   quote: string;
@@ -58,8 +58,5 @@ export const reviews: Review[] = [
   },
 ];
 
-/** The reviews the site should show right now. */
-export function visibleReviews() {
-  const allowDemo = process.env.NODE_ENV !== "production" || process.env.NEXT_PUBLIC_SHOW_DEMO_REVIEWS === "true";
-  return reviews.filter((r) => allowDemo || !r.demo);
-}
+/** True while any sample review is still on the page (drives the visible note). */
+export const hasSampleReviews = reviews.some((r) => r.demo);

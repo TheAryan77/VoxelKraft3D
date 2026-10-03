@@ -241,6 +241,7 @@ export const reviewsCopy = {
   heading: "What customers say",
   sub: "From first-time ideas to repeat orders.",
   ratingLabel: (rating: number) => `${rating} out of 5 stars`,
+  sampleNote: "Sample reviews. Real customer stories coming soon.",
 };
 
 export const foundersCopy = {

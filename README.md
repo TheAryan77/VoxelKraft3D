@@ -52,8 +52,8 @@ and send the link with the form.
 
 - Replace the `{PLACEHOLDERS}` in `src/content/site.ts` (layer height, materials,
   turnaround, reply time, city, email, WhatsApp).
-- Replace the demo reviews in `src/content/reviews.ts` with real ones (demo reviews
-  are hidden in production).
+- Replace the sample reviews in `src/content/reviews.ts` with real ones (while any
+  sample remains, the section shows a "Sample reviews" note).
 - Fill in sizes and print times in `src/content/work.ts`.
 - Check that every Sketchfab model licence allows commercial web use, and replace
   trademarked characters (BatMinion, Batman, iPhone) if needed.
