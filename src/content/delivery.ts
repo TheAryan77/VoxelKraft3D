@@ -6,11 +6,8 @@ export interface Place {
   lng: number;
 }
 
-/**
- * The studio. TODO: set the real coordinates (these are New Delhi as a
- * stand-in) and the city name via PLACEHOLDERS.CITY.
- */
-export const origin: Place = { label: PLACEHOLDERS.CITY, lat: 28.61, lng: 77.21 };
+/** The studio, in Gurgaon. The name comes from PLACEHOLDERS.CITY in site.ts. */
+export const origin: Place = { label: PLACEHOLDERS.CITY, lat: 28.46, lng: 77.03 };
 
 /** Sample destinations — replace with places you've actually shipped to. */
 export const destinations: Place[] = [
