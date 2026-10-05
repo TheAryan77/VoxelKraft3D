@@ -35,6 +35,19 @@ npm run dev
 
 A missing or broken model falls back to the placeholder; nothing crashes.
 
+## 100-day challenge reels
+
+With `INSTAGRAM_ACCESS_TOKEN` set, the site fetches @voxelkraft.in's newest reels
+from the Instagram API every hour, reads "Day N" from each caption and shows the
+newest 5 (older days drop off). Without it, it shows `fallbackReels` in
+`src/content/challenge.ts`.
+
+Getting a token: switch @voxelkraft.in to a Professional (Creator or Business)
+account, create an app at developers.facebook.com with the "Instagram API with
+Instagram Login" product, add the account, and generate a long-lived token
+(scope `instagram_business_basic`). It lasts 60 days; refresh it before then with
+`https://graph.instagram.com/refresh_access_token?grant_type=ig_refresh_token&access_token=<token>`.
+
 ## Environment variables
 
 See `.env.example`. The quote form emails through Resend when `RESEND_API_KEY`,

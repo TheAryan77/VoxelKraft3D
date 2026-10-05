@@ -3,8 +3,8 @@
 // (scripts/generate-world-map.mjs) and drawn as a CSS mask, so it takes the
 // theme's colour with no runtime map library. Routes draw once when the map
 // scrolls into view; reduced motion shows them drawn, without pulses.
-import { useId } from "react";
-import { motion, useReducedMotion } from "motion/react";
+import { useId, useRef } from "react";
+import { motion, useInView, useReducedMotion } from "motion/react";
 import { cn } from "@/lib/utils";
 
 export interface MapPoint {
@@ -49,11 +49,16 @@ export default function WorldMap({
   label: string;
 }) {
   const id = useId().replace(/:/g, "");
+  // Routes draw when the visible part of the map is on screen. Watching each
+  // route instead failed on phones, where the map is wider than the screen and
+  // long routes never had enough of themselves in view.
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, amount: 0.15 });
   const reduced = useReducedMotion();
   const start = projectPoint(origin.lat, origin.lng);
 
   return (
-    <div className={cn("relative w-full select-none", className)} style={{ aspectRatio: `${VIEW.width} / ${VIEW.height}` }}>
+    <div ref={ref} className={cn("relative w-full select-none", className)} style={{ aspectRatio: `${VIEW.width} / ${VIEW.height}` }}>
       {/* Dots: the pre-generated SVG used as a mask over a themed fill. */}
       <div
         aria-hidden
@@ -85,8 +90,7 @@ export default function WorldMap({
               stroke={`url(#${id}-route)`}
               strokeWidth="1.2"
               initial={{ pathLength: reduced ? 1 : 0 }}
-              whileInView={{ pathLength: 1 }}
-              viewport={{ once: true, amount: 0.4 }}
+              animate={{ pathLength: inView || reduced ? 1 : 0 }}
               transition={{ duration: 1.1, delay: 0.25 * i, ease: "easeOut" }}
             />
           );

@@ -111,7 +111,8 @@ function Rig({
   let spinTarget = 0;
   if (!reduced && !interactive) {
     if (active !== undefined) spinTarget = (isMobile ? visible : active) ? 1 : 0;
-    else spinTarget = entry.autoRotate && !isMobile ? 1 : 0;
+    // Auto-rotating models spin on phones too, but only while on screen.
+    else spinTarget = entry.autoRotate && (!isMobile || visible) ? 1 : 0;
   }
   const tiltEnabled = parallax && !reduced && !isMobile;
   const speed = useRef(spinTarget);

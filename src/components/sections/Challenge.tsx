@@ -3,7 +3,7 @@
 import { useRef } from "react";
 import { useIsMobile } from "@/lib/useReducedMotion";
 import { DraggableCardBody, DraggableCardContainer } from "@/components/ui/draggable-card";
-import { challenge } from "@/content/challenge";
+import { challenge, type ChallengeReel } from "@/content/challenge";
 import { challengeCopy, cursorCopy } from "@/content/site";
 import { cursorProps } from "@/lib/cursor";
 import { cn } from "@/lib/utils";
@@ -32,10 +32,10 @@ const MOBILE_LAYOUT = [
   { scale: 0.7, place: "left-[4%] top-[44rem] rotate-[-4deg]" },
 ];
 
-export function Challenge() {
+export function Challenge({ reels }: { reels: ChallengeReel[] }) {
   const pileRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
-  const latest = challenge.reels[0]?.day ?? 0;
+  const latest = reels[0]?.day ?? 0;
   const pct = Math.min(100, (latest / challenge.totalDays) * 100);
 
   return (
@@ -82,7 +82,7 @@ export function Challenge() {
         {/* A scattered pile of reels. On phones, cards drag by their "Day"
             strip only, so the page still scrolls and videos stay tappable. */}
         <DraggableCardContainer ref={pileRef} className="relative mt-4 h-[70rem] w-full md:h-[38rem]">
-          {challenge.reels.slice(0, LAYOUT.length).map((reel, i) => {
+          {reels.slice(0, Math.min(challenge.cardCount, LAYOUT.length)).map((reel, i) => {
             const { scale, place } = isMobile ? MOBILE_LAYOUT[i] : LAYOUT[i];
             return (
               <div key={reel.code} className={cn("absolute", place)}>
@@ -102,7 +102,7 @@ export function Challenge() {
   );
 }
 
-type Reel = (typeof challenge.reels)[number];
+type Reel = ChallengeReel;
 
 /** Day label strip plus the Instagram embed, scaled to `scale`. */
 function ReelCard({ reel, scale }: { reel: Reel; scale: number }) {

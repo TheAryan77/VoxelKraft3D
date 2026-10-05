@@ -12,11 +12,16 @@ import { Delivery } from "@/components/sections/Delivery";
 import { FinalCta } from "@/components/sections/FinalCta";
 import { Footer } from "@/components/sections/Footer";
 import { availableFiles, publicFileExists } from "@/lib/assets";
+import { getChallengeReels } from "@/lib/instagram";
 import { processCopy, site } from "@/content/site";
 import { work } from "@/content/work";
 import { founders } from "@/content/founders";
 
-export default function Home() {
+/** Re-check Instagram for new challenge reels at most once an hour. */
+export const revalidate = 3600;
+
+export default async function Home() {
+  const reels = await getChallengeReels();
   // Media is checked at build time, so placeholders show until files are added.
   const hasLogo = publicFileExists(site.logoSrc);
   const workPhotos = availableFiles(work.map((w) => w.photo));
@@ -42,7 +47,7 @@ export default function Home() {
         <Work photos={workPhotos} />
         <Process media={processMedia} />
         <Materials />
-        <Challenge />
+        <Challenge reels={reels} />
         <Founders photos={founderPhotos} />
         <Reviews />
         <FinalCta />
