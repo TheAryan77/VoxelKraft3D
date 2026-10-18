@@ -15,6 +15,7 @@
 
 # next.js
 /.next/
+/.next-build/
 /out/
 
 # production
@@ -42,3 +43,6 @@ next-env.d.ts
 
 # keep the example env file
 !.env.example
+
+# local product uploads (dev only)
+/.local-uploads/

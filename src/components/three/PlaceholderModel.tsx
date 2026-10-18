@@ -5,19 +5,14 @@ import * as THREE from "three";
 import { useThree } from "@react-three/fiber";
 import type { PlaceholderKind } from "@/lib/models.config";
 import { useStore } from "@/lib/store";
-import { themeStore } from "@/lib/theme";
+import { appearanceStore } from "@/lib/theme";
+import { sceneColors } from "@/lib/themeConfig";
 import { getPlaceholderGeometry } from "./placeholderGeometries";
 
-/** --surface-2 and --line per theme. Kept in sync with globals.css. */
-const COLORS = {
-  dark: { solid: "#171513", line: "#2a2622" },
-  light: { solid: "#fff4ec", line: "#f2a877" },
-};
-
-/** Wireframe in --line over a faint solid in --surface-2: intentional, not broken. */
+/** Faint wireframe (tinted by the accent) over a solid in the palette: intentional, not broken. */
 export function PlaceholderModel({ kind }: { kind: PlaceholderKind }) {
   const { solid, edges } = getPlaceholderGeometry(kind);
-  const theme = useStore(themeStore);
+  const { palette, accent } = useStore(appearanceStore);
   const invalidate = useThree((s) => s.invalidate);
 
   const materials = useMemo(
@@ -37,10 +32,11 @@ export function PlaceholderModel({ kind }: { kind: PlaceholderKind }) {
   );
 
   useEffect(() => {
-    materials.solid.color.set(COLORS[theme].solid);
-    materials.line.color.set(COLORS[theme].line);
+    const c = sceneColors(palette, accent);
+    materials.solid.color.set(c.solid);
+    materials.line.color.set(c.placeholderLine);
     invalidate();
-  }, [materials, theme, invalidate]);
+  }, [materials, palette, accent, invalidate]);
 
   useEffect(
     () => () => {

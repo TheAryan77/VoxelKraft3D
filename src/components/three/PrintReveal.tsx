@@ -14,6 +14,9 @@ import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
 import { Line } from "@react-three/drei";
 import { MODELS } from "@/lib/models.config";
+import { useStore } from "@/lib/store";
+import { appearanceStore } from "@/lib/theme";
+import { sceneColors } from "@/lib/themeConfig";
 import { modelPrintProgress, modelPrintStart, setAnimating, startHeroPrint, startModelPrint } from "@/lib/sceneStore";
 import { GLBModel } from "./GLBModel";
 import { ModelErrorBoundary } from "./ModelErrorBoundary";
@@ -24,7 +27,6 @@ export const FX_LAYER = 1;
 
 const BINS = 48;
 const PARK_MS = 900;
-const MOLTEN = "#ff6a13";
 
 interface Profile {
   minY: number;
@@ -215,6 +217,8 @@ export function PrintReveal({ children, visible, hotend = false }: PrintRevealPr
   });
 
   const hotendEntry = MODELS.hotend;
+  const { palette, accent } = useStore(appearanceStore);
+  const MOLTEN = sceneColors(palette, accent).accent;
 
   return (
     <>

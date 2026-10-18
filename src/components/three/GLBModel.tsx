@@ -5,14 +5,9 @@ import * as THREE from "three";
 import { useGLTF } from "@react-three/drei";
 import { useThree } from "@react-three/fiber";
 import { DRACO_DECODER_PATH, type ModelFinish } from "@/lib/models.config";
+import { sceneColors } from "@/lib/themeConfig";
 import { useStore } from "@/lib/store";
-import { themeStore } from "@/lib/theme";
-
-/** Wireframe finish colours per theme: body (--surface-2) and triangle edges. */
-const WIRE_COLORS = {
-  dark: { solid: "#171513", line: "#8c7c6a" },
-  light: { solid: "#fff4ec", line: "#f2a877" },
-};
+import { appearanceStore } from "@/lib/theme";
 
 /**
  * Drains colour from a material in its shader (after texture and vertex
@@ -50,10 +45,10 @@ export function GLBModel({
   finish?: ModelFinish;
 }) {
   const { scene } = useGLTF(src, draco ? DRACO_DECODER_PATH : false);
-  const theme = useStore(themeStore);
+  const { palette, accent } = useStore(appearanceStore);
   const invalidate = useThree((s) => s.invalidate);
 
-  // Shared by every mesh in the wireframe finish; recoloured on theme change.
+  // Shared by every mesh in the wireframe finish; recoloured when the appearance changes.
   const wire = useMemo(
     () => ({
       solid: new THREE.MeshStandardMaterial({
@@ -96,14 +91,14 @@ export function GLBModel({
 
   useEffect(() => {
     if (finish !== "wireframe") return;
-    const colors = WIRE_COLORS[theme];
+    const colors = sceneColors(palette, accent);
     clone.traverse((o) => {
       const mat = (o as THREE.Mesh).material as THREE.MeshStandardMaterial | THREE.LineBasicMaterial | undefined;
       if (!mat || Array.isArray(mat)) return;
-      mat.color.set(o.name === "vk-wireframe" ? colors.line : colors.solid);
+      mat.color.set(o.name === "vk-wireframe" ? colors.wire : colors.solid);
     });
     invalidate();
-  }, [clone, finish, theme, invalidate]);
+  }, [clone, finish, palette, accent, invalidate]);
 
   useEffect(
     () => () => {

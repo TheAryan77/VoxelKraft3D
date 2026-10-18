@@ -14,6 +14,7 @@ import {
 import { MovingBorderLink, MoltenButton } from "@/components/shared/Button";
 import { Logo } from "@/components/shared/Logo";
 import { ThemeToggle } from "@/components/shared/ThemeToggle";
+import { AccountButton, CartButton } from "@/components/shop/NavActions";
 import { nav } from "@/content/site";
 import { heroCtaVisible } from "@/lib/sceneStore";
 import { useStore } from "@/lib/store";
@@ -44,6 +45,8 @@ export function Navbar({ hasLogo }: { hasLogo: boolean }) {
         <NavItems items={nav.links} />
         <div className="relative z-20 flex items-center gap-2">
           <ThemeToggle />
+          <CartButton />
+          <AccountButton />
           <MovingBorderLink href={nav.cta.href} live={!heroCtaOnScreen} containerClassName="h-11">
             {nav.cta.label}
           </MovingBorderLink>
@@ -57,6 +60,7 @@ export function Navbar({ hasLogo }: { hasLogo: boolean }) {
           </Link>
           <div className="flex items-center gap-1">
             <ThemeToggle className="border-transparent" />
+            <CartButton className="border-transparent" />
             <MobileNavToggle
               isOpen={open}
               onClick={() => setOpen((o) => !o)}
@@ -71,7 +75,7 @@ export function Navbar({ hasLogo }: { hasLogo: boolean }) {
       <MobileNavMenu isOpen={open} id="mobile-menu">
         <nav>
           <ul className="flex flex-col gap-2">
-            {nav.links.map((item) => (
+            {[...nav.links, ...nav.mobileExtra].map((item) => (
               <li key={item.link}>
                 <a
                   href={item.link}
@@ -84,7 +88,10 @@ export function Navbar({ hasLogo }: { hasLogo: boolean }) {
             ))}
           </ul>
         </nav>
-        <MoltenButton href={nav.cta.href} onClick={() => setOpen(false)} className="mt-10 w-full">
+        <div className="mt-8 flex items-center gap-3" onClick={() => setOpen(false)}>
+          <AccountButton />
+        </div>
+        <MoltenButton href={nav.cta.href} onClick={() => setOpen(false)} className="mt-6 w-full">
           {nav.cta.label}
         </MoltenButton>
       </MobileNavMenu>

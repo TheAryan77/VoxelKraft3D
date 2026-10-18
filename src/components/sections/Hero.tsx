@@ -66,7 +66,7 @@ export function Hero() {
   return (
     <section aria-labelledby="hero-heading" className="relative overflow-x-clip" {...cursorProps(cursorCopy.hero)}>
       <div aria-hidden className="pointer-events-none absolute inset-0 opacity-50 light:opacity-80">
-        <Spotlight className="-top-40 -left-24 md:-top-32 md:left-[12%]" fill="#FF6A13" />
+        <Spotlight className="-top-40 -left-24 md:-top-32 md:left-[12%]" fill="var(--color-molten)" />
       </div>
 
       <div className="container-site relative grid min-h-[100svh] grid-cols-1 content-center gap-5 pb-8 pt-20 md:grid-cols-12 md:gap-8 md:pb-10 md:gap-x-6 md:gap-y-4 md:pt-28">

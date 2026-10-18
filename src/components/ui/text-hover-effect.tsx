@@ -56,10 +56,10 @@ export const TextHoverEffect = ({
     >
       <defs>
         <linearGradient id={`${id}-grad`} gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1000" y2="0">
-          <stop offset="0%" stopColor="#ffb27a" />
-          <stop offset="35%" stopColor="#ff6a13" />
-          <stop offset="70%" stopColor="#b8925a" />
-          <stop offset="100%" stopColor="#ff6a13" />
+          <stop offset="0%" style={{ stopColor: "var(--color-molten-hover)" }} />
+          <stop offset="35%" style={{ stopColor: "var(--color-molten)" }} />
+          <stop offset="70%" style={{ stopColor: "var(--color-pei)" }} />
+          <stop offset="100%" style={{ stopColor: "var(--color-molten)" }} />
         </linearGradient>
         <motion.radialGradient
           id={`${id}-reveal`}

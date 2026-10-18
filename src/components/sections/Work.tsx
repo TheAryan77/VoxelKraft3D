@@ -122,7 +122,9 @@ function WorkModal({
   const titleId = `${id}-${item.slug}-title`;
 
   useOutsideClick(ref, onClose);
-  useEffect(() => closeRef.current?.focus({ preventScroll: true }), []);
+  useEffect(() => {
+    closeRef.current?.focus({ preventScroll: true });
+  }, []);
 
   // Keep keyboard focus inside the dialog.
   const onKeyDown = (e: React.KeyboardEvent) => {

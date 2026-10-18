@@ -3,6 +3,12 @@ import type { NextConfig } from "next";
 const day = 60 * 60 * 24;
 
 const nextConfig: NextConfig = {
+  // Lets a production build run beside `next dev` without clobbering it.
+  distDir: process.env.NEXT_DIST_DIR || ".next",
+  images: {
+    // Product photos uploaded from /admin live on Vercel Blob.
+    remotePatterns: [{ protocol: "https", hostname: "*.public.blob.vercel-storage.com" }],
+  },
   async headers() {
     return [
       {

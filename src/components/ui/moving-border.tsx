@@ -92,15 +92,26 @@ export const MovingBorder = ({
   const progress = useMotionValue<number>(0);
 
   useAnimationFrame((time) => {
-    const length = pathRef.current?.getTotalLength();
+    let length = 0;
+    try {
+      length = pathRef.current?.getTotalLength() ?? 0;
+    } catch {}
     if (length) {
       const pxPerMillisecond = length / duration;
       progress.set((time * pxPerMillisecond) % length);
     }
   });
 
-  const x = useTransform(progress, (val) => pathRef.current?.getPointAtLength(val).x ?? 0);
-  const y = useTransform(progress, (val) => pathRef.current?.getPointAtLength(val).y ?? 0);
+  // getPointAtLength throws while the button is hidden or not laid out yet.
+  const pointAt = (val: number) => {
+    try {
+      return pathRef.current?.getPointAtLength(val) ?? null;
+    } catch {
+      return null;
+    }
+  };
+  const x = useTransform(progress, (val) => pointAt(val)?.x ?? 0);
+  const y = useTransform(progress, (val) => pointAt(val)?.y ?? 0);
 
   const transform = useMotionTemplate`translateX(${x}px) translateY(${y}px) translateX(-50%) translateY(-50%)`;
 

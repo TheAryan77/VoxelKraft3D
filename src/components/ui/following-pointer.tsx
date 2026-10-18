@@ -4,11 +4,12 @@
 // [data-cursor] / [data-cursor-tone] ancestor of whatever is under the mouse.
 // Mouse-only (fine pointer + hover); text fields keep the native caret.
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { motion, AnimatePresence, useMotionValue, useSpring, useReducedMotion, type MotionValue } from "motion/react";
 import type { PointerTone } from "@/lib/cursor";
 
 const TONES: Record<PointerTone, { bg: string; fg: string }> = {
-  molten: { bg: "#ff6a13", fg: "#050505" },
+  molten: { bg: "var(--color-molten)", fg: "var(--color-on-molten)" },
   ember: { bg: "#ff8a3d", fg: "#050505" },
   amber: { bg: "#f2b04b", fg: "#050505" },
   pei: { bg: "#b8925a", fg: "#050505" },
@@ -25,6 +26,10 @@ export function FollowingPointerLayer() {
   const [tone, setTone] = useState<PointerTone>("molten");
   const [pressed, setPressed] = useState(false);
   const reduced = useReducedMotion();
+  const pathname = usePathname();
+
+  // A new page may be a native-cursor zone (e.g. admin); wait for the next move.
+  useEffect(() => setVisible(false), [pathname]);
 
   const x = useMotionValue(-100);
   const y = useMotionValue(-100);

@@ -54,15 +54,15 @@ export const TracingBeam = ({ children, className }: { children: React.ReactNode
             strokeLinecap="round"
             className="motion-reduce:hidden"
           />
-          <motion.circle cx="11" cy={tipY} r="7" fill="var(--color-molten)" opacity="0.25" className="motion-reduce:hidden" style={{ filter: "blur(4px)" }} />
-          <motion.circle cx="11" cy={tipY} r="2.2" fill="#ffb27a" className="motion-reduce:hidden" />
+          <motion.circle cx="11" cy={tipY} r="7" opacity="0.25" className="motion-reduce:hidden" style={{ fill: "var(--color-molten)", filter: "blur(4px)" }} />
+          <motion.circle cx="11" cy={tipY} r="2.2" className="motion-reduce:hidden" style={{ fill: "var(--color-molten-hover)" }} />
           <defs>
             {/* Cooled filament behind, hot at the tip, nothing ahead of it. */}
             <motion.linearGradient id={gradientId} gradientUnits="userSpaceOnUse" x1="0" x2="0" y1="0" y2={tipY}>
-              <stop stopColor="#ff6a13" stopOpacity="0.18" />
-              <stop offset="0.82" stopColor="#ff6a13" stopOpacity="0.7" />
-              <stop offset="0.985" stopColor="#ffb27a" stopOpacity="1" />
-              <stop offset="1" stopColor="#ffb27a" stopOpacity="0" />
+              <stop style={{ stopColor: "var(--color-molten)" }} stopOpacity="0.18" />
+              <stop offset="0.82" style={{ stopColor: "var(--color-molten)" }} stopOpacity="0.7" />
+              <stop offset="0.985" style={{ stopColor: "var(--color-molten-hover)" }} stopOpacity="1" />
+              <stop offset="1" style={{ stopColor: "var(--color-molten-hover)" }} stopOpacity="0" />
             </motion.linearGradient>
           </defs>
         </svg>

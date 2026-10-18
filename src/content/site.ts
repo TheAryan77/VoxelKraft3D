@@ -30,17 +30,30 @@ export const site = {
 
 export const nav = {
   links: [
+    { name: "Shop", link: "/shop" },
     { name: "Work", link: "/#work" },
     { name: "Services", link: "/#services" },
-    { name: "Process", link: "/#process" },
     { name: "Materials", link: "/#materials" },
     { name: "About", link: "/#challenge" },
   ],
+  /** Phone menu shows a few more. */
+  mobileExtra: [
+    { name: "Process", link: "/#process" },
+    { name: "My orders", link: "/account/orders" },
+  ],
+  cart: "Cart",
+  cartCount: (n: number) => `Cart, ${n} ${n === 1 ? "item" : "items"}`,
+  account: "Your account",
+  signIn: "Sign in",
+  admin: "Admin",
   cta: { label: "Start a project", href: "/#quote" },
   openMenu: "Open menu",
   closeMenu: "Close menu",
-  themeToLight: "Switch to light theme",
-  themeToDark: "Switch to dark theme",
+  appearance: "Appearance",
+  appearanceBackground: "Background",
+  appearanceAccent: "Accent & wireframe",
+  appearanceAccentHint: "Colours buttons, highlights and the 3D wireframes.",
+  appearanceReset: "Reset",
   home: "Voxel Kraft 3D home",
 };
 
