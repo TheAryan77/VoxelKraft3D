@@ -24,6 +24,18 @@ export async function createRazorpayOrder(amount: number, receipt: string) {
   return (await res.json()) as { id: string; amount: number };
 }
 
+/** The captured payment on a Razorpay order, if any (asks Razorpay directly). */
+export async function findCapturedPayment(razorpayOrderId: string) {
+  const res = await fetch(`https://api.razorpay.com/v1/orders/${encodeURIComponent(razorpayOrderId)}/payments`, {
+    headers: { Authorization: `Basic ${Buffer.from(`${keyId}:${keySecret}`).toString("base64")}` },
+    cache: "no-store",
+    signal: AbortSignal.timeout(5000),
+  });
+  if (!res.ok) throw new Error(`Razorpay payments lookup failed: ${res.status}`);
+  const { items } = (await res.json()) as { items: { id: string; status: string }[] };
+  return items.find((p) => p.status === "captured") ?? null;
+}
+
 function safeEqual(a: string, b: string) {
   const ab = Buffer.from(a);
   const bb = Buffer.from(b);

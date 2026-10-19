@@ -4,7 +4,8 @@
 // Photos fall back to placeholder blocks until the real files exist.
 
 import { IconArrowLeft, IconArrowRight } from "@tabler/icons-react";
-import { motion, AnimatePresence, useReducedMotion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
+import { useReducedMotion } from "@/lib/useReducedMotion";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import { cn } from "@/lib/utils";

@@ -19,6 +19,6 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   }
   return NextResponse.json({
     status: convo.status,
-    messages: convo.messages.map((m) => ({ id: m.id, sender: m.sender, body: m.body, createdAt: m.createdAt.toISOString() })),
+    messages: convo.messages.map((m) => ({ id: m.id, sender: m.sender, body: m.body, attachments: m.attachments, createdAt: m.createdAt.toISOString() })),
   });
 }

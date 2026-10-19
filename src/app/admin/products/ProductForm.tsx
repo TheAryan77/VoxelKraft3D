@@ -163,7 +163,7 @@ export function ProductForm({ initial, categories }: { initial: ProductFormValue
             <Field label="Ships in (days)">
               <input value={v.leadTimeDays} onChange={(e) => set("leadTimeDays", e.target.value)} inputMode="numeric" className={inputStyles} />
             </Field>
-            <Field label="Stock" hint="Empty = made to order.">
+            <Field label="Stock" hint="Empty = made to order. 0 = shows Out of stock.">
               <input value={v.stock} onChange={(e) => set("stock", e.target.value)} inputMode="numeric" className={inputStyles} />
             </Field>
           </div>

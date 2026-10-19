@@ -5,6 +5,9 @@ import { z } from "zod";
 import { db } from "@/lib/db";
 import { assertUser } from "@/lib/shop/session";
 import { addressSchema, type AddressInput } from "@/lib/shop/address";
+import { isEditable } from "@/lib/shop/status";
+import { orderLabel } from "@/lib/shop/config";
+import { notifyAdmin } from "@/lib/shop/notify";
 
 type Result = { ok: true } | { ok: false; error: string };
 
@@ -73,9 +76,29 @@ export async function cancelOrder(orderId: string): Promise<Result> {
   const user = await assertUser();
   const order = await db.order.findFirst({ where: { id: orderId, userId: user.id }, include: { items: true } });
   if (!order) return { ok: false, error: "Order not found" };
-  if (!["PENDING_PAYMENT", "PLACED", "CONFIRMED"].includes(order.status)) return { ok: false, error: "This order is already being printed. Message us and we'll help." };
+  if (!isEditable(order.status)) return { ok: false, error: "This order is already being printed. Message us and we'll help." };
   await restockAndCancel(order.id, order.items, "Cancelled by customer.");
   revalidatePath(`/account/orders/${orderId}`);
+  return { ok: true };
+}
+
+/** Customers can change their customisation request until the order goes into printing. */
+export async function updateCustomisation(orderId: string, text: string): Promise<Result> {
+  const user = await assertUser();
+  const parsed = z.string().trim().max(500, "Keep it under 500 characters").safeParse(text);
+  if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? "Check the request" };
+  const note = parsed.data || null;
+  const order = await db.order.findFirst({ where: { id: orderId, userId: user.id } });
+  if (!order) return { ok: false, error: "Order not found" };
+  if (!isEditable(order.status)) return { ok: false, error: "Printing has started, so this can't be changed any more." };
+  if (note === order.customerNote) return { ok: true };
+  await db.order.update({
+    where: { id: orderId },
+    data: { customerNote: note, events: { create: { note: note ? `Customisation updated: ${note}` : "Customisation request removed." } } },
+  });
+  await notifyAdmin(`Customisation changed on ${orderLabel(order.number)}`, `${note ?? "(removed)"}\n\nOpen /admin/orders/${order.id}`);
+  revalidatePath(`/account/orders/${orderId}`);
+  revalidatePath(`/admin/orders/${orderId}`);
   return { ok: true };
 }
 

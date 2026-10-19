@@ -4,7 +4,8 @@
 // theme's colour with no runtime map library. Routes draw once when the map
 // scrolls into view; reduced motion shows them drawn, without pulses.
 import { useId, useRef } from "react";
-import { motion, useInView, useReducedMotion } from "motion/react";
+import { motion, useInView } from "motion/react";
+import { useReducedMotion } from "@/lib/useReducedMotion";
 import { cn } from "@/lib/utils";
 
 export interface MapPoint {

@@ -18,7 +18,7 @@ export interface ModelSlotProps {
   interactive?: boolean;
   /** Hover-driven rotation. Spins while true on desktop, while in view on mobile. */
   active?: boolean;
-  /** Tilts up to ±6° toward the cursor. */
+  /** Turns toward the cursor (about ±20° sideways, ±8° up and down). */
   parallax?: boolean;
   /** Hotend rides the print edge (print-reveal only). */
   hotend?: boolean;
@@ -32,6 +32,10 @@ export interface ModelSlotProps {
   bleed?: string;
   /** 0..1 — dims the model by laying page background over it. */
   dim?: number;
+  /** Print-reveal plays again (for models that rotate in after the first). */
+  replay?: boolean;
+  /** Models to download in the background, so switching to them is instant. */
+  preload?: ModelSlotId[];
 }
 
 /**
@@ -51,6 +55,8 @@ export function ModelSlot({
   framing,
   bleed,
   dim,
+  replay,
+  preload,
 }: ModelSlotProps) {
   const entry = MODELS[id];
   const isMobile = useIsMobile();
@@ -74,7 +80,7 @@ export function ModelSlot({
         <SceneSlot
           className={cn("absolute inset-0", bleed)}
           layer={layer}
-          scene={{ kind: "model", id, mode, interactive, active, parallax, hotend, framing, onFail }}
+          scene={{ kind: "model", id, mode, interactive, active, parallax, hotend, framing, replay, preload, onFail }}
         />
       )}
       {dim ? <div aria-hidden className="pointer-events-none absolute inset-0 z-[35] bg-bg" style={{ opacity: dim }} /> : null}

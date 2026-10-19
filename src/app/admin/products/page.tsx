@@ -45,7 +45,7 @@ export default async function AdminProducts() {
                   </td>
                   <td className="px-5 py-3 text-text-muted">{p.category.name}</td>
                   <td className="px-5 py-3 font-machine text-text">{formatPrice(p.price)}</td>
-                  <td className="px-5 py-3 font-machine text-text-muted">{p.stock ?? "Made to order"}</td>
+                  <td className={`px-5 py-3 font-machine ${p.stock !== null && p.stock <= 0 ? "text-error" : "text-text-muted"}`}>{p.stock === null ? "Made to order" : p.stock <= 0 ? "Out of stock" : p.stock}</td>
                   <td className="px-5 py-3 text-text-muted">{p.isActive ? "In shop" : "Hidden"}</td>
                   <td className="px-5 py-3 text-right">
                     <ProductRowActions id={p.id} slug={p.slug} isActive={p.isActive} />

@@ -39,7 +39,7 @@ export function Navbar({ hasLogo }: { hasLogo: boolean }) {
   return (
     <ResizableNavbar>
       <NavBody>
-        <Link href="/" aria-label={nav.home} className="relative z-20 rounded-full px-3 py-2">
+        <Link href="/" aria-label={nav.home} className="relative z-20 flex items-center rounded-full px-2 py-1.5">
           <Logo hasLogo={hasLogo} />
         </Link>
         <NavItems items={nav.links} />
@@ -55,7 +55,7 @@ export function Navbar({ hasLogo }: { hasLogo: boolean }) {
 
       <MobileNav>
         <MobileNavHeader>
-          <Link href="/" aria-label={nav.home} className="rounded-full px-2 py-2" onClick={() => setOpen(false)}>
+          <Link href="/" aria-label={nav.home} className="flex items-center rounded-full px-1 py-1.5" onClick={() => setOpen(false)}>
             <Logo hasLogo={hasLogo} />
           </Link>
           <div className="flex items-center gap-1">

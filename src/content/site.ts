@@ -32,9 +32,7 @@ export const nav = {
   links: [
     { name: "Shop", link: "/shop" },
     { name: "Work", link: "/#work" },
-    { name: "Services", link: "/#services" },
-    { name: "Materials", link: "/#materials" },
-    { name: "About", link: "/#challenge" },
+    { name: "About", link: "/about" },
   ],
   /** Phone menu shows a few more. */
   mobileExtra: [
@@ -61,6 +59,8 @@ export const hero = {
   headline: ["We print", "your ideas."],
   subline: "Custom 3D printing for prototypes, parts, miniatures and one-offs.",
   primaryCta: { label: "Start a project", href: "#quote" },
+  modelsLabel: "Models on the print bed",
+  showModel: (name: string) => `Show the ${name.toLowerCase()}`,
   secondaryCta: { label: "See our work", href: "#work" },
   /** Real specs of the printer. */
   machineData: [
@@ -71,11 +71,23 @@ export const hero = {
   ],
 };
 
-export const servicesCopy = {
-  heading: "What we make",
-  sub: "From a single prototype to a small batch.",
-  askLabel: "Ask about this",
-  swipeHint: "Swipe to see all five.",
+export const journeyCopy = {
+  eyebrow: "How a print is made",
+  heading: "From idea to object",
+  sub: "Every piece goes through four stages. Use the arrows, or drag the bar to watch one come together.",
+  stages: [
+    { title: "Idea + material", body: "It starts with your idea (a sketch, a photo or a file) and raw filament." },
+    { title: "Wireframe", body: "We turn it into a 3D model and check every detail, size and strength before printing." },
+    { title: "Layers", body: "The printer builds it one thin layer at a time, from the build plate up." },
+    { title: "Finished", body: "Cleaned up and finished in colour, then packed. Ready to ship or pick up." },
+  ],
+  previous: "Previous stage",
+  next: "Next stage",
+  play: "Play",
+  pause: "Pause",
+  progressLabel: "Build progress",
+  stageOf: (n: number, total: number) => `Stage ${n} of ${total}`,
+  dragHint: "Drag the model to turn it",
 };
 
 export const workCopy = {
@@ -194,7 +206,8 @@ export const quoteCopy = {
 
 export const ctaCopy = {
   headline: ["Have an idea?", "Let's print it."],
-  button: { label: "Start a project", href: "#quote" },
+  // Absolute, so it also works on /about (the quote form lives on the home page).
+  button: { label: "Start a project", href: "/#quote" },
 };
 
 export const footerCopy = {
@@ -238,7 +251,7 @@ export const placeholderCopy = {
 export const cursorCopy = {
   hero: { label: "Let's print", tone: "molten" },
   heroModel: { label: "Printing now", tone: "ember" },
-  services: { label: "Pick a service", tone: "pei" },
+  journey: { label: "Drag to turn", tone: "amber" },
   work: { label: "Open this print", tone: "ember" },
   workModel: { label: "Drag to turn", tone: "amber" },
   process: { label: "Layer by layer", tone: "rim" },
@@ -252,6 +265,26 @@ export const cursorCopy = {
   cta: { label: "Let's talk", tone: "molten" },
   footer: { label: "Say hello", tone: "ink" },
 } as const;
+
+export const aboutCopy = {
+  eyebrow: "About us",
+  headline: ["Small studio.", "Real prints."],
+  intro: `Voxel Kraft is a 3D printing studio in ${PLACEHOLDERS.CITY}, run by two people: Anurag and Aryan. Send us a file, a sketch or just an idea, and we turn it into something you can hold, printed to order on our own machine.`,
+  facts: [
+    { label: "Based in", value: PLACEHOLDERS.CITY },
+    { label: "Founded by", value: "Anurag & Aryan" },
+    { label: "Materials", value: "PLA, PETG, ABS, TPU" },
+    { label: "Every piece", value: "Printed to order" },
+  ],
+  valuesHeading: "How we work",
+  values: [
+    { title: "Show the work", body: "We build in public. Every day of our 100-day challenge goes on Instagram, and you get progress photos of your own print." },
+    { title: "Clear prices", body: "We check your idea, pick the right material and confirm the price before a single layer goes down." },
+    { title: "Made for you", body: "Nothing sits on a shelf. Each order is printed fresh, and you can tweak the details until printing starts." },
+  ],
+  cta: { label: "Start a project", href: "/#quote" },
+  shop: { label: "Browse the shop", href: "/shop" },
+};
 
 export const reviewsCopy = {
   heading: "What customers say",

@@ -4,7 +4,8 @@
 // the outline draws itself the first time it scrolls into view (not on load,
 // since it sits at the very bottom of the page). Static under reduced motion.
 import React, { useEffect, useId, useRef, useState } from "react";
-import { motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
+import { useReducedMotion } from "@/lib/useReducedMotion";
 
 export const TextHoverEffect = ({
   text,

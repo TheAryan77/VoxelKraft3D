@@ -5,12 +5,14 @@ import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { requireUser } from "@/lib/shop/session";
 import { formatPrice } from "@/lib/shop/money";
-import { orderLabel } from "@/lib/shop/config";
-import { PAYMENT_STATUS_LABEL } from "@/lib/shop/status";
+import { orderLabel, shopPolicy } from "@/lib/shop/config";
+import { PAYMENT_STATUS_LABEL, isEditable } from "@/lib/shop/status";
 import { razorpayEnabled } from "@/lib/shop/razorpay";
-import { Card, Pill, StatusBadge } from "@/components/shop/ui";
+import { syncRazorpayPayment } from "@/lib/shop/payments";
+import { ButtonLink, Card, Pill, StatusBadge } from "@/components/shop/ui";
 import { OrderTimeline } from "@/components/shop/OrderTimeline";
 import { OrderActions } from "./OrderActions";
+import { CustomisationEditor } from "./CustomisationEditor";
 
 export const metadata: Metadata = { title: "Order" };
 export const dynamic = "force-dynamic";
@@ -19,13 +21,14 @@ export default async function OrderPage({ params, searchParams }: { params: Prom
   const { id } = await params;
   const { placed } = await searchParams;
   const user = await requireUser(`/account/orders/${id}`);
-  const order = await db.order.findFirst({
-    where: { id, userId: user.id },
-    include: { items: true, events: { orderBy: { createdAt: "asc" } }, conversations: { select: { id: true }, take: 1 } },
-  });
+  const where = { id, userId: user.id };
+  const include = { items: true, events: { orderBy: { createdAt: "asc" as const } }, conversations: { select: { id: true }, take: 1 } };
+  let order = await db.order.findFirst({ where, include });
   if (!order) notFound();
+  if (await syncRazorpayPayment(order)) order = (await db.order.findFirst({ where, include }))!;
   const canPay = order.paymentMethod === "RAZORPAY" && order.paymentStatus !== "PAID" && order.status !== "CANCELLED" && razorpayEnabled;
-  const canCancel = ["PENDING_PAYMENT", "PLACED", "CONFIRMED"].includes(order.status);
+  const canCancel = isEditable(order.status);
+  const delivered = order.status === "DELIVERED";
 
   return (
     <div className="flex flex-col gap-6">
@@ -62,6 +65,18 @@ export default async function OrderPage({ params, searchParams }: { params: Prom
               </div>
             )}
           </Card>
+          {order.status !== "CANCELLED" && <CustomisationEditor orderId={order.id} note={order.customerNote} editable={isEditable(order.status)} />}
+          {delivered && (
+            <Card className="flex flex-col gap-3 border-molten/40">
+              <h2 className="font-heading text-lg text-text">Something wrong with your order?</h2>
+              <p className="text-sm text-text-muted">
+                If it arrived damaged or isn&apos;t what you ordered, raise a query with photos or an unboxing video and we&apos;ll sort out an exchange.
+              </p>
+              <div>
+                <ButtonLink href={`/account/support/new?order=${order.id}&query=1`}>Raise a query</ButtonLink>
+              </div>
+            </Card>
+          )}
           <OrderActions orderId={order.id} canPay={canPay} canCancel={canCancel} conversationId={order.conversations[0]?.id} orderLabel={orderLabel(order.number)} />
         </div>
 
@@ -94,7 +109,10 @@ export default async function OrderPage({ params, searchParams }: { params: Prom
             <h2 className="mb-2 font-heading text-lg text-text">Delivering to</h2>
             <p className="text-sm text-text">{order.shipName} · {order.shipPhone}</p>
             <p className="text-sm text-text-muted">{[order.shipLine1, order.shipLine2, order.shipCity, `${order.shipState} ${order.shipPincode}`].filter(Boolean).join(", ")}</p>
-            {order.customerNote && <p className="mt-3 text-sm text-text-muted">Note: {order.customerNote}</p>}
+          </Card>
+          <Card>
+            <h2 className="mb-2 font-heading text-lg text-text">{shopPolicy.returns.title}</h2>
+            <p className="text-sm text-text-muted">{shopPolicy.returns.body}</p>
           </Card>
         </div>
       </div>

@@ -12,10 +12,13 @@ export function AddToCart({
   product,
   colors,
   soldOut,
+  maxQuantity = shopConfig.maxQuantityPerItem,
 }: {
   product: Omit<CartItem, "quantity" | "color">;
   colors: string[];
   soldOut: boolean;
+  /** Stock left (capped at the per-item limit). */
+  maxQuantity?: number;
 }) {
   const router = useRouter();
   const [color, setColor] = useState(colors[0]);
@@ -62,9 +65,10 @@ export function AddToCart({
           <span className="w-8 text-center font-machine text-sm" aria-live="polite">{qty}</span>
           <button
             type="button"
-            onClick={() => setQty((q) => Math.min(shopConfig.maxQuantityPerItem, q + 1))}
+            onClick={() => setQty((q) => Math.min(maxQuantity, q + 1))}
+            disabled={soldOut || qty >= maxQuantity}
             aria-label="Increase quantity"
-            className="grid h-11 w-11 place-items-center text-text-muted hover:text-text"
+            className="grid h-11 w-11 place-items-center text-text-muted hover:text-text disabled:opacity-40"
           >
             <IconPlus size={16} />
           </button>
@@ -74,6 +78,8 @@ export function AddToCart({
             <>
               <IconCheck size={16} /> Added
             </>
+          ) : soldOut ? (
+            "Out of stock"
           ) : (
             "Add to cart"
           )}
@@ -86,7 +92,7 @@ export function AddToCart({
           disabled={soldOut}
           className="flex-1 whitespace-nowrap px-4 sm:flex-none sm:px-6"
         >
-          {soldOut ? "Sold out" : "Buy now"}
+          Buy now
         </Button>
       </div>
     </div>

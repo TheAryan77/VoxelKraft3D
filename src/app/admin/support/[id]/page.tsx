@@ -31,7 +31,7 @@ export default async function AdminConversation({ params }: { params: Promise<{ 
           conversationId={convo.id}
           as="ADMIN"
           closed={convo.status === "CLOSED"}
-          initial={convo.messages.map((m) => ({ id: m.id, sender: m.sender, body: m.body, createdAt: m.createdAt.toISOString() }))}
+          initial={convo.messages.map((m) => ({ id: m.id, sender: m.sender, body: m.body, attachments: m.attachments, createdAt: m.createdAt.toISOString() }))}
         />
       </div>
       <div className="flex flex-col gap-4 xl:col-span-4">

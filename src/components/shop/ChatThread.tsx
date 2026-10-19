@@ -4,9 +4,10 @@ import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { IconSend } from "@tabler/icons-react";
 import { sendMessage } from "@/lib/shop/actions/support";
 import { Button, inputStyles } from "./ui";
+import { AttachmentList, AttachmentPicker } from "./Attachments";
 import { cn } from "@/lib/utils";
 
-type Msg = { id: string; sender: "CUSTOMER" | "ADMIN"; body: string; createdAt: string };
+type Msg = { id: string; sender: "CUSTOMER" | "ADMIN"; body: string; attachments: string[]; createdAt: string };
 
 const time = new Intl.DateTimeFormat("en-IN", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
 
@@ -17,6 +18,9 @@ const time = new Intl.DateTimeFormat("en-IN", { day: "numeric", month: "short", 
 export function ChatThread({ conversationId, initial, as, closed }: { conversationId: string; initial: Msg[]; as: "CUSTOMER" | "ADMIN"; closed?: boolean }) {
   const [messages, setMessages] = useState(initial);
   const [text, setText] = useState("");
+  const [files, setFiles] = useState<string[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const [resetKey, setResetKey] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   const endRef = useRef<HTMLDivElement>(null);
@@ -41,12 +45,13 @@ export function ChatThread({ conversationId, initial, as, closed }: { conversati
 
   const send = () => {
     const body = text.trim();
-    if (!body) return;
+    if ((!body && !files.length) || uploading) return;
     setError(null);
     startTransition(async () => {
-      const r = await sendMessage(conversationId, body);
+      const r = await sendMessage(conversationId, body, files);
       if (!r.ok) return setError(r.error);
       setText("");
+      setResetKey((k) => k + 1);
       await refresh();
     });
   };
@@ -58,7 +63,10 @@ export function ChatThread({ conversationId, initial, as, closed }: { conversati
           const mine = m.sender === as;
           return (
             <div key={m.id} className={cn("flex max-w-[85%] flex-col gap-1", mine ? "self-end items-end" : "self-start items-start")}>
-              <div className={cn("whitespace-pre-wrap rounded-[16px] px-4 py-2.5 text-sm", mine ? "bg-molten text-on-molten" : "bg-surface-2 text-text")}>{m.body}</div>
+              {m.body && (
+                <div className={cn("whitespace-pre-wrap rounded-[16px] px-4 py-2.5 text-sm", mine ? "bg-molten text-on-molten" : "bg-surface-2 text-text")}>{m.body}</div>
+              )}
+              <AttachmentList urls={m.attachments ?? []} className={mine ? "justify-end" : undefined} />
               <span className="text-[11px] text-text-muted">
                 {m.sender === "ADMIN" ? "Voxel Kraft" : as === "ADMIN" ? "Customer" : "You"} · {time.format(new Date(m.createdAt))}
               </span>
@@ -68,12 +76,13 @@ export function ChatThread({ conversationId, initial, as, closed }: { conversati
         <div ref={endRef} />
       </div>
       <form
-        className="flex items-end gap-2 border-t border-line p-3 md:p-4"
+        className="flex flex-wrap items-end gap-2 border-t border-line p-3 md:p-4"
         onSubmit={(e) => {
           e.preventDefault();
           send();
         }}
       >
+        <AttachmentPicker compact resetKey={resetKey} onChange={setFiles} onBusyChange={setUploading} />
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
@@ -87,9 +96,9 @@ export function ChatThread({ conversationId, initial, as, closed }: { conversati
           maxLength={2000}
           placeholder={closed ? "This conversation is closed. Writing reopens it." : "Write a message…"}
           aria-label="Message"
-          className={cn(inputStyles, "h-auto min-h-11 resize-none py-3")}
+          className={cn(inputStyles, "h-auto min-h-11 min-w-0 flex-1 resize-none py-3")}
         />
-        <Button type="submit" disabled={pending || !text.trim()} aria-label="Send" className="h-11 w-11 shrink-0 px-0">
+        <Button type="submit" disabled={pending || uploading || (!text.trim() && !files.length)} aria-label="Send" className="h-11 w-11 shrink-0 px-0">
           <IconSend size={16} />
         </Button>
       </form>

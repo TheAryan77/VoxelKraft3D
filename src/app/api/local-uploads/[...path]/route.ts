@@ -1,8 +1,16 @@
 import { NextResponse } from "next/server";
 
-const TYPES: Record<string, string> = { jpg: "image/jpeg", png: "image/png", webp: "image/webp", avif: "image/avif" };
+const TYPES: Record<string, string> = {
+  jpg: "image/jpeg",
+  png: "image/png",
+  webp: "image/webp",
+  avif: "image/avif",
+  mp4: "video/mp4",
+  mov: "video/quicktime",
+  webm: "video/webm",
+};
 
-/** Serves images uploaded from /admin during local development only. */
+/** Serves files uploaded during local development only (admin product photos, support attachments). */
 export async function GET(_request: Request, { params }: { params: Promise<{ path: string[] }> }) {
   if (process.env.NODE_ENV !== "development") return NextResponse.json({ error: "Not found" }, { status: 404 });
   const { path: parts } = await params;

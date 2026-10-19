@@ -7,7 +7,7 @@ import { addressSchema } from "@/lib/shop/address";
 import { orderLabel, shippingFor, shopConfig } from "@/lib/shop/config";
 import { createRazorpayOrder, razorpayEnabled, razorpayKeyId, verifyPaymentSignature } from "@/lib/shop/razorpay";
 import { notifyAdmin } from "@/lib/shop/notify";
-import { markRazorpayPaid } from "@/lib/shop/payments";
+import { markRazorpayPaid, syncRazorpayPayment } from "@/lib/shop/payments";
 
 const placeOrderSchema = z.object({
   items: z
@@ -22,8 +22,11 @@ const placeOrderSchema = z.object({
 });
 
 export type PlaceOrderResult =
-  | { ok: true; orderId: string; razorpay?: { keyId: string; orderId: string; amount: number; label: string } }
+  | { ok: true; orderId: string; razorpay?: { keyId: string; orderId: string; amount: number; label: string; contact: string } }
   | { ok: false; error: string };
+
+/** Razorpay wants the mobile with country code; prefilling it skips its "Contact details" step. */
+const razorpayContact = (phone: string) => `+91${phone.replace(/\D/g, "").slice(-10)}`;
 
 export async function placeOrder(input: z.input<typeof placeOrderSchema>): Promise<PlaceOrderResult> {
   const user = await assertUser();
@@ -119,7 +122,7 @@ export async function placeOrder(input: z.input<typeof placeOrderSchema>): Promi
   try {
     const rp = await createRazorpayOrder(total, orderLabel(order.number));
     await db.order.update({ where: { id: order.id }, data: { razorpayOrderId: rp.id } });
-    return { ok: true, orderId: order.id, razorpay: { keyId: razorpayKeyId, orderId: rp.id, amount: total, label: orderLabel(order.number) } };
+    return { ok: true, orderId: order.id, razorpay: { keyId: razorpayKeyId, orderId: rp.id, amount: total, label: orderLabel(order.number), contact: razorpayContact(address.phone) } };
   } catch (err) {
     console.error("[checkout] razorpay order failed", err);
     return { ok: false, error: "Couldn't start the payment. Please try again or choose cash on delivery." };
@@ -146,7 +149,9 @@ export async function retryRazorpayPayment(orderId: string): Promise<PlaceOrderR
     return { ok: false, error: "This order doesn't need a payment." };
   }
   if (!razorpayEnabled) return { ok: false, error: "Online payment isn't available right now." };
+  // Never charge twice: an earlier attempt may have gone through without reaching us.
+  if (await syncRazorpayPayment(order)) return { ok: false, error: "This order is already paid. Refreshing…" };
   const rp = await createRazorpayOrder(order.total, orderLabel(order.number));
   await db.order.update({ where: { id: order.id }, data: { razorpayOrderId: rp.id, paymentStatus: "PENDING" } });
-  return { ok: true, orderId: order.id, razorpay: { keyId: razorpayKeyId, orderId: rp.id, amount: order.total, label: orderLabel(order.number) } };
+  return { ok: true, orderId: order.id, razorpay: { keyId: razorpayKeyId, orderId: rp.id, amount: order.total, label: orderLabel(order.number), contact: razorpayContact(order.shipPhone) } };
 }

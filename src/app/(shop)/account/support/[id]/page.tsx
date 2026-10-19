@@ -33,7 +33,7 @@ export default async function ConversationPage({ params }: { params: Promise<{ i
         conversationId={convo.id}
         as="CUSTOMER"
         closed={convo.status === "CLOSED"}
-        initial={convo.messages.map((m) => ({ id: m.id, sender: m.sender, body: m.body, createdAt: m.createdAt.toISOString() }))}
+        initial={convo.messages.map((m) => ({ id: m.id, sender: m.sender, body: m.body, attachments: m.attachments, createdAt: m.createdAt.toISOString() }))}
       />
     </div>
   );

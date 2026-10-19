@@ -5,19 +5,41 @@
  * and set `src` below. A slot with `src: null` renders a procedural placeholder.
  */
 
+/**
+ * The hero shows these in turn, each printed in from the bottom, changing every
+ * HERO_MODEL_MS. Add an id here (and its entry below) to add a model; `name`
+ * labels its dot.
+ */
+export interface HeroModel {
+  id: ModelSlotId;
+  name: string;
+  /** Camera framing in the hero (margin: lower = bigger; lift: raise in the frame). */
+  framing?: { margin: number; lift: number };
+  mobileFraming?: { margin: number; lift: number };
+}
+
+export const HERO_MODELS: HeroModel[] = [
+  { id: "hero-print", name: "Castle", framing: { margin: 0.94, lift: 0.07 }, mobileFraming: { margin: 0.9, lift: 0.02 } },
+  { id: "hero-face", name: "Face", framing: { margin: 1.3, lift: 0.04 }, mobileFraming: { margin: 1.15, lift: 0.02 } },
+  { id: "hero-goku", name: "Goku", framing: { margin: 1.12, lift: 0.03 }, mobileFraming: { margin: 1.05, lift: 0.01 } },
+  { id: "hero-ironman", name: "Iron Man", framing: { margin: 1.12, lift: 0.03 }, mobileFraming: { margin: 1.0, lift: 0.01 } },
+  { id: "hero-spaceship", name: "Spaceship", framing: { margin: 1.45, lift: 0.06 }, mobileFraming: { margin: 1.1, lift: 0.02 } },
+];
+export const HERO_MODEL_MS = 7000;
+
 /** Self-hosted Draco decoder (copied from three/examples/jsm/libs/draco/gltf). */
 export const DRACO_DECODER_PATH = "/draco/";
 
 export type ModelSlotId =
   | "hero-print"
+  | "hero-face"
+  | "hero-goku"
+  | "hero-ironman"
+  | "hero-spaceship"
   | "hotend"
-  | "service-prototype"
-  | "service-custom"
-  | "service-functional"
-  | "service-miniature"
-  | "service-architectural"
   | "work-01" | "work-02" | "work-03" | "work-04" | "work-05" | "work-06"
-  | "cta-object";
+  | "cta-object"
+  | "journey";
 
 /** "solid" = as exported (see `saturation`); "wireframe" = raw triangle mesh. */
 export type ModelFinish = "solid" | "wireframe";
@@ -56,17 +78,15 @@ export interface ModelEntry {
 export const MODELS: Record<ModelSlotId, ModelEntry> = {
   // "Low poly medieval castle" by assetfactory on Sketchfab (Sketchfab Standard licence). Collider mesh stripped.
   "hero-print":            { src: "/models/hero-print.glb", placeholder: "vase", autoRotate: true, saturation: 0.12, finish: "wireframe", label: "Hero signature print" },
-  "hotend":                { src: null, placeholder: "nozzle",   label: "Printer nozzle / hotend (optional)" },
-  // "Mercedes car" by funkyJeans on Sketchfab (CC BY 4.0, credited in the footer). 308k -> 53k triangles. Angled to a 3/4 view.
-  "service-prototype":     { src: "/models/service-prototype-car.glb", finish: "wireframe", placeholder: "box", autoRotate: true, rotation: [0, 0.85, 0], margin: 0.44, lift: 0.08, mobileMargin: 0.7, mobileLift: 0.03, label: "Service: Prototyping" },
   // "Human face" by thunk3d.scanner on Sketchfab (CC BY 4.0, credited in the footer). Simplified from 804k to 56k triangles.
-  "service-custom":        { src: "/models/service-custom.glb", finish: "wireframe", placeholder: "figure", autoRotate: true, margin: 0.82, label: "Service: Custom models" },
-  // "Steampunk Gear" by Darren McNerney 3D on Sketchfab (CC BY 4.0, credited in the footer). Turned 90° to face the camera.
-  "service-functional":    { src: "/models/service-functional.glb", finish: "wireframe", placeholder: "gear", autoRotate: true, rotation: [0, Math.PI / 2, 0], label: "Service: Functional parts" },
-  // "BatMinion" by Bernardo de Aquino on Sketchfab (CC BY 4.0, credited in the footer). Simplified from 209k to 59k triangles.
-  "service-miniature":     { src: "/models/service-miniature.glb", finish: "wireframe", placeholder: "figure", autoRotate: true, margin: 0.72, label: "Service: Miniatures" },
-  // "Medieval house" by Vanuartw on Sketchfab (CC BY 4.0, credited in the footer). 23 MB -> 705 KB: textures 512px, tangents stripped.
-  "service-architectural": { src: "/models/service-architectural.glb", finish: "wireframe", placeholder: "building", autoRotate: true, margin: 0.88, lift: 0.05, label: "Service: Architectural" },
+  "hero-face":             { src: "/models/hero-face.glb", placeholder: "figure", autoRotate: true, finish: "wireframe", label: "Hero rotation: face" },
+  // "DBXV2 Goku Damaged1" by 20062020year on Sketchfab (listed CC BY 4.0, credited in the footer). Rig baked to a static pose at load.
+  "hero-goku":             { src: "/models/hero-goku.glb", placeholder: "figure", autoRotate: true, finish: "wireframe", label: "Hero rotation: Goku" },
+  // "Iron Man Rig" by Darth Iron on Sketchfab (Sketchfab Standard licence). Rig baked to a static pose at load.
+  "hero-ironman":          { src: "/models/hero-ironman.glb", placeholder: "figure", autoRotate: true, finish: "wireframe", label: "Hero rotation: Iron Man" },
+  // "Star Sparrow Modular Spaceship" by Ebal Studios on Sketchfab (Sketchfab Standard licence).
+  "hero-spaceship":        { src: "/models/hero-spaceship.glb", placeholder: "box", autoRotate: true, rotation: [0, 0.75, 0], finish: "wireframe", label: "Hero rotation: spaceship" },
+  "hotend":                { src: null, placeholder: "nozzle",   label: "Printer nozzle / hotend (optional)" },
   "work-01":               { src: null, placeholder: "vase",     label: "Portfolio piece 1" },
   "work-02":               { src: null, placeholder: "figure",   label: "Portfolio piece 2" },
   "work-03":               { src: null, placeholder: "gear",     label: "Portfolio piece 3" },
@@ -74,4 +94,8 @@ export const MODELS: Record<ModelSlotId, ModelEntry> = {
   "work-05":               { src: null, placeholder: "box",      label: "Portfolio piece 5 (optional)" },
   "work-06":               { src: null, placeholder: "torus",    label: "Portfolio piece 6 (optional)" },
   "cta-object":            { src: null, placeholder: "torus",    autoRotate: true, label: "Final CTA object (optional, can reuse hero)" },
+  // "Mercedes car" by funkyJeans on Sketchfab (CC BY 4.0, credited in the footer). 308k -> 53k triangles.
+  // "From idea to object" section: shown going from raw material to a finished, coloured piece.
+  // Swap `src` for any other .glb with colours or textures (the last stage shows its real materials).
+  "journey":               { src: "/models/journey-car.glb", placeholder: "box", rotation: [0, 0.85, 0], label: "Idea-to-object journey" },
 };

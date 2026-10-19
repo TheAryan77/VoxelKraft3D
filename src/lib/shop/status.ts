@@ -29,3 +29,10 @@ export const ORDER_STATUS_TONE: Record<OrderStatus, "muted" | "live" | "done" | 
   DELIVERED: "done",
   CANCELLED: "bad",
 };
+
+/** Until printing starts the customer can still cancel or change their customisation. */
+export const EDITABLE_STATUSES: OrderStatus[] = ["PENDING_PAYMENT", "PLACED", "CONFIRMED"];
+
+export function isEditable(status: OrderStatus) {
+  return EDITABLE_STATUSES.includes(status);
+}

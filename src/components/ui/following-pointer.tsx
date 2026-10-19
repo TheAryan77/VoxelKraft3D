@@ -5,7 +5,8 @@
 // Mouse-only (fine pointer + hover); text fields keep the native caret.
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { motion, AnimatePresence, useMotionValue, useSpring, useReducedMotion, type MotionValue } from "motion/react";
+import { motion, AnimatePresence, useMotionValue, useSpring, type MotionValue } from "motion/react";
+import { useReducedMotion } from "@/lib/useReducedMotion";
 import type { PointerTone } from "@/lib/cursor";
 
 const TONES: Record<PointerTone, { bg: string; fg: string }> = {

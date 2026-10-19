@@ -3,6 +3,7 @@
 import { MaterialSphere } from "./MaterialSphere";
 import { ModelScene } from "./ModelScene";
 import { StlPreview } from "./StlPreview";
+import { JourneyScene } from "./JourneyScene";
 import type { SlotSceneDescriptor } from "./types";
 
 export interface SceneRuntime {
@@ -19,6 +20,8 @@ export function SceneRouter({ scene, runtime }: { scene: SlotSceneDescriptor; ru
       return <ModelScene {...scene} {...runtime} />;
     case "material":
       return <MaterialSphere materialId={scene.materialId} hovered={scene.hovered} visible={runtime.visible} reduced={runtime.reduced} />;
+    case "journey":
+      return <JourneyScene progress={scene.progress} {...runtime} />;
     case "stl":
       return <StlPreview file={scene.file} visible={runtime.visible} onMeasured={scene.onMeasured} onFail={scene.onFail} />;
   }

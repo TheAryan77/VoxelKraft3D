@@ -30,7 +30,13 @@ export type SlotSceneDescriptor =
       parallax?: boolean;
       hotend?: boolean;
       framing?: Framing;
+      /** Print-reveal plays again on this model, even after an earlier print finished. */
+      replay?: boolean;
+      /** Other models to start downloading now, so switching to them is instant. */
+      preload?: ModelSlotId[];
       onFail?: () => void;
     }
   | { kind: "material"; materialId: MaterialId; hovered: boolean }
-  | { kind: "stl"; file: File; onMeasured?: (dims: StlDims) => void; onFail?: () => void };
+  | { kind: "stl"; file: File; onMeasured?: (dims: StlDims) => void; onFail?: () => void }
+  /** Idea-to-object stages. `progress` runs 0..3 (stage index, fractional mid-transition). */
+  | { kind: "journey"; progress: { get(): number } };

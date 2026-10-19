@@ -25,12 +25,18 @@ export default function SlotViewport({ scene, visible, hidden }: SlotViewportPro
   const reduced = useReducedMotion();
   const [element, setElement] = useState<HTMLElement | null>(null);
   const interactive = scene.kind === "model" && !!scene.interactive;
+  // The journey model turns with a sideways drag; vertical swipes still scroll the page.
+  const draggable = scene.kind === "journey";
 
   return (
     <View
       ref={setElement as never}
       className="absolute inset-0"
-      style={{ pointerEvents: interactive ? "auto" : "none", touchAction: interactive ? "none" : undefined, cursor: interactive ? "grab" : undefined }}
+      style={{
+        pointerEvents: interactive || draggable ? "auto" : "none",
+        touchAction: interactive ? "none" : draggable ? "pan-y" : undefined,
+        cursor: interactive || draggable ? "grab" : undefined,
+      }}
       visible={!hidden}
     >
       <SceneRouter scene={scene} runtime={{ visible: visible && !hidden, isMobile, reduced, element }} />

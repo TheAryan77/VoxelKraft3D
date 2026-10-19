@@ -16,7 +16,10 @@ export function OrderActions({ orderId, canPay, canCancel, conversationId, order
     start(async () => {
       setError(null);
       const r = await retryRazorpayPayment(orderId);
-      if (!r.ok || !r.razorpay) return setError(r.ok ? "Payment isn't needed." : r.error);
+      if (!r.ok || !r.razorpay) {
+        router.refresh();
+        return setError(r.ok ? "Payment isn't needed." : r.error);
+      }
       if (!window.Razorpay) {
         await new Promise<void>((resolve) => {
           const s = document.createElement("script");
@@ -34,6 +37,7 @@ export function OrderActions({ orderId, canPay, canCancel, conversationId, order
         currency: "INR",
         name: "Voxel Kraft 3D",
         description: `Order ${r.razorpay.label}`,
+        prefill: { contact: r.razorpay.contact },
         theme: { color: currentAccentHex() },
         handler: (resp: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }) =>
           start(async () => {

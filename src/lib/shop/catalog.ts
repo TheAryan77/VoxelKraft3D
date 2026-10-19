@@ -8,8 +8,19 @@ const cardSelect = {
   price: true,
   compareAt: true,
   images: true,
+  stock: true,
   category: { select: { name: true, slug: true } },
 } as const;
+
+/** stock null = made to order, so only an explicit 0 (or less) is out of stock. */
+export function isOutOfStock(p: { stock: number | null }) {
+  return p.stock !== null && p.stock <= 0;
+}
+
+/** Keeps the database order but moves out-of-stock products to the end. */
+function inStockFirst<T extends { stock: number | null }>(products: T[]) {
+  return [...products].sort((a, b) => Number(isOutOfStock(a)) - Number(isOutOfStock(b)));
+}
 
 export async function getCategories() {
   const categories = await db.category.findMany({
@@ -29,7 +40,7 @@ export async function getCategories() {
 
 export async function getProducts({ categorySlug, query, featured }: { categorySlug?: string; query?: string; featured?: boolean } = {}) {
   const q = query?.trim();
-  return db.product.findMany({
+  const products = await db.product.findMany({
     where: {
       isActive: true,
       category: { isActive: true, ...(categorySlug ? { slug: categorySlug } : {}) },
@@ -41,6 +52,7 @@ export async function getProducts({ categorySlug, query, featured }: { categoryS
     orderBy: [{ isFeatured: "desc" }, { createdAt: "desc" }],
     select: cardSelect,
   });
+  return inStockFirst(products);
 }
 
 export async function getProduct(slug: string) {
@@ -51,10 +63,11 @@ export async function getProduct(slug: string) {
 }
 
 export async function getRelated(productId: string, categoryId: string) {
-  return db.product.findMany({
+  const products = await db.product.findMany({
     where: { isActive: true, categoryId, id: { not: productId } },
-    take: 4,
+    take: 8,
     orderBy: { isFeatured: "desc" },
     select: cardSelect,
   });
+  return inStockFirst(products).slice(0, 4);
 }

@@ -183,6 +183,7 @@ model Order {
   shipCity          String
   shipState         String
   shipPincode       String
+  /// Customisation request / note. The customer can edit it until printing starts.
   customerNote      String?
   courier           String?
   trackingNumber    String?
@@ -264,6 +265,8 @@ model Message {
   conversationId String
   sender         Sender
   body           String
+  /// Photo / video URLs (proof for exchange requests, etc.).
+  attachments    String[] @default([])
   createdAt      DateTime @default(now())
 
   conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)

@@ -1,6 +1,6 @@
 import { Navbar } from "@/components/sections/Navbar";
 import { Hero } from "@/components/sections/Hero";
-import { Services } from "@/components/sections/Services";
+import { Journey } from "@/components/sections/Journey";
 import { Work } from "@/components/sections/Work";
 import { Process, type StepMedia } from "@/components/sections/Process";
 import { Materials } from "@/components/sections/Materials";
@@ -43,7 +43,7 @@ export default async function Home() {
       <Navbar hasLogo={hasLogo} />
       <main id="main">
         <Hero />
-        <Services />
+        <Journey />
         <Work photos={workPhotos} />
         <Process media={processMedia} />
         <Materials />

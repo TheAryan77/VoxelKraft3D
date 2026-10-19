@@ -2,13 +2,15 @@
 
 import { cursorProps } from "@/lib/cursor";
 import { useEffect, useRef, useState } from "react";
+import { motion, useInView } from "motion/react";
 import { Spotlight } from "@/components/ui/spotlight";
 import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
 import { LayerReveal } from "@/components/shared/LayerReveal";
 import { MovingBorderLink, TextButton } from "@/components/shared/Button";
 import { ModelSlot } from "@/components/three/ModelSlot";
 import { cursorCopy, hero } from "@/content/site";
-import { heroCtaVisible, heroPrintStart, startHeroPrint } from "@/lib/sceneStore";
+import { heroCtaVisible, heroPrintStart, modelPrintStart, startHeroPrint } from "@/lib/sceneStore";
+import { HERO_MODELS, HERO_MODEL_MS } from "@/lib/models.config";
 import { useStore } from "@/lib/store";
 import { useIsMobile, useReducedMotion } from "@/lib/useReducedMotion";
 import { cn } from "@/lib/utils";
@@ -62,6 +64,9 @@ export function Hero() {
   }, []);
 
   const showRest = headlineDone || reduced;
+  const stage = useRef<HTMLDivElement>(null);
+  const rotation = useHeroRotation(stage, reduced);
+  const current = HERO_MODELS[rotation.slide];
 
   return (
     <section aria-labelledby="hero-heading" className="relative overflow-x-clip" {...cursorProps(cursorCopy.hero)}>
@@ -71,17 +76,60 @@ export function Hero() {
 
       <div className="container-site relative grid min-h-[100svh] grid-cols-1 content-center gap-5 pb-8 pt-20 md:grid-cols-12 md:gap-8 md:pb-10 md:gap-x-6 md:gap-y-4 md:pt-28">
         {/* Model stage: above the text on mobile, 7/12 on desktop. No radius. */}
-        <div {...cursorProps(cursorCopy.heroModel)} className="relative h-[42svh] min-h-[280px] md:min-h-0 md:col-span-7 md:col-start-6 md:row-start-1 md:-mr-6 md:-mt-14 md:h-[min(86vh,840px)] lg:-mr-12">
+        <div ref={stage} {...cursorProps(cursorCopy.heroModel)} className="relative h-[42svh] min-h-[280px] md:min-h-0 md:col-span-7 md:col-start-6 md:row-start-1 md:-mr-6 md:-mt-14 md:h-[min(86vh,840px)] lg:-mr-12">
           <BuildPlate />
           <ModelSlot
-            id="hero-print"
+            id={current.id}
             mode="print-reveal"
             hotend
             parallax
-            framing={isMobile ? HERO_FRAMING_MOBILE : HERO_FRAMING}
+            replay={rotation.switches > 0}
+            preload={HERO_MODELS.filter((m) => m.id !== current.id).map((m) => m.id)}
+            framing={(isMobile ? current.mobileFraming : current.framing) ?? (isMobile ? HERO_FRAMING_MOBILE : HERO_FRAMING)}
             bleed={HERO_BLEED}
             className="absolute inset-0"
           />
+          {HERO_MODELS.length > 1 && (
+            <div
+              role="group"
+              aria-label={hero.modelsLabel}
+              className={cn(
+                "absolute bottom-0 left-1/2 z-40 flex -translate-x-1/2 items-center transition-opacity duration-700 md:bottom-6",
+                showRest ? "opacity-100" : "opacity-0",
+              )}
+            >
+              {HERO_MODELS.map((m, i) => {
+                const active = i === rotation.slide;
+                return (
+                  <button
+                    key={m.id}
+                    type="button"
+                    onClick={() => rotation.goTo(i)}
+                    aria-label={hero.showModel(m.name)}
+                    aria-current={active ? "true" : undefined}
+                    className="group grid h-8 place-items-center px-1.5"
+                  >
+                    <span
+                      className={cn(
+                        "relative block h-2 overflow-hidden rounded-full transition-[width,background-color] duration-300",
+                        active ? "w-9 bg-line" : "w-2 bg-text-muted/40 group-hover:bg-text-muted",
+                      )}
+                    >
+                      {active && rotation.fillKey && (
+                        <motion.span
+                          key={rotation.fillKey}
+                          className="absolute inset-0 origin-left rounded-full bg-molten"
+                          initial={{ scaleX: rotation.fillFrom }}
+                          animate={{ scaleX: rotation.autoplay ? 1 : rotation.fillFrom }}
+                          transition={{ duration: rotation.fillSeconds, ease: "linear" }}
+                        />
+                      )}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {/* z-40 keeps the text above the canvas where the model's area overlaps it. */}
@@ -135,6 +183,59 @@ export function Hero() {
       </div>
     </section>
   );
+}
+
+/**
+ * Hero model rotation: each model prints in, stays for HERO_MODEL_MS from the
+ * start of its print, then the next one prints in. The clock only runs while
+ * the hero is on screen; a dot click jumps straight to that model.
+ */
+function useHeroRotation(stage: React.RefObject<HTMLDivElement | null>, reduced: boolean) {
+  const [slide, setSlide] = useState(0);
+  const [switches, setSwitches] = useState(0);
+  // Which slide the current print clock belongs to (the next model may still be loading).
+  const [printedFor, setPrintedFor] = useState<number | null>(null);
+  const printStart = useStore(modelPrintStart, null);
+  const inView = useInView(stage, { amount: 0.3 });
+  const slideRef = useRef(slide);
+  slideRef.current = slide;
+
+  useEffect(() => {
+    if (printStart !== null) setPrintedFor(slideRef.current);
+  }, [printStart]);
+
+  const goTo = (i: number) => {
+    if (i === slide) return;
+    setPrintedFor(null);
+    setSlide(i);
+    setSwitches((n) => n + 1);
+  };
+
+  const ready = printedFor === slide && printStart !== null && Number.isFinite(printStart);
+  const autoplay = HERO_MODELS.length > 1 && !reduced && inView && ready;
+
+  useEffect(() => {
+    if (!autoplay || printStart === null) return;
+    const left = Math.max(0, HERO_MODEL_MS - (performance.now() - printStart));
+    const t = window.setTimeout(() => {
+      setPrintedFor(null);
+      setSlide((s) => (s + 1) % HERO_MODELS.length);
+      setSwitches((n) => n + 1);
+    }, left);
+    return () => window.clearTimeout(t);
+  }, [autoplay, printStart]);
+
+  // The active dot fills over the model's time on the bed.
+  const elapsed = ready && printStart !== null ? Math.min(HERO_MODEL_MS, performance.now() - printStart) : 0;
+  return {
+    slide,
+    switches,
+    goTo,
+    autoplay,
+    fillKey: ready ? `${slide}-${printStart}-${autoplay}` : null,
+    fillFrom: elapsed / HERO_MODEL_MS,
+    fillSeconds: (HERO_MODEL_MS - elapsed) / 1000,
+  };
 }
 
 /** Faint PEI build-plate speckle under the model, so it reads as the print bed. */

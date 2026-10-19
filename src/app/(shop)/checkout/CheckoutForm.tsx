@@ -6,7 +6,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { cart, cartSubtotal, useCart } from "@/lib/shop/cart";
 import { formatPrice } from "@/lib/shop/money";
-import { shippingFor } from "@/lib/shop/config";
+import { shippingFor, shopPolicy } from "@/lib/shop/config";
 import { addressSchema, type AddressInput } from "@/lib/shop/address";
 import { confirmRazorpayPayment, placeOrder } from "@/lib/shop/actions/checkout";
 import { AddressFields, emptyAddress } from "@/components/shop/AddressFields";
@@ -105,7 +105,7 @@ export function CheckoutForm({
         currency: "INR",
         name: "Voxel Kraft 3D",
         description: `Order ${result.razorpay.label}`,
-        prefill: { name: customer.name, email: customer.email },
+        prefill: { name: customer.name, email: customer.email, contact: result.razorpay.contact },
         theme: { color: currentAccentHex() },
         handler: (resp: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }) => {
           startTransition(async () => {
@@ -179,7 +179,7 @@ export function CheckoutForm({
         </Card>
 
         <Card>
-          <Field label="Note for us (optional)" hint="Colour preferences, gift message, delivery instructions…">
+          <Field label="Customisation or note (optional)" hint="Colour, size, name or text to add, gift message, delivery instructions… You can change this from your order page until printing starts.">
             <textarea value={note} onChange={(e) => setNote(e.target.value)} maxLength={500} rows={3} className={cn(inputStyles, "h-auto py-3")} />
           </Field>
         </Card>
@@ -212,8 +212,12 @@ export function CheckoutForm({
           <Button onClick={submit} disabled={pending} className="mt-2 h-12 w-full">
             {pending ? "Placing order…" : effectiveMethod === "RAZORPAY" ? `Pay ${formatPrice(total)}` : "Place order"}
           </Button>
+          <div className="rounded-[12px] border border-line p-3 text-xs text-text-muted">
+            <p className="font-semibold text-text">{shopPolicy.returns.title}</p>
+            <p className="mt-1">{shopPolicy.returns.body}</p>
+          </div>
           <p className="text-xs text-text-muted">
-            By placing the order you agree to our <Link href="/contact" className="underline">terms</Link>. Prints are made to order.
+            By placing the order you agree to our <Link href="/contact" className="underline">terms</Link>.
           </p>
         </Card>
       </aside>

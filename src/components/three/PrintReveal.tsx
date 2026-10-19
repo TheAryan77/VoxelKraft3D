@@ -17,7 +17,7 @@ import { MODELS } from "@/lib/models.config";
 import { useStore } from "@/lib/store";
 import { appearanceStore } from "@/lib/theme";
 import { sceneColors } from "@/lib/themeConfig";
-import { modelPrintProgress, modelPrintStart, setAnimating, startHeroPrint, startModelPrint } from "@/lib/sceneStore";
+import { modelPrintProgress, modelPrintStart, restartModelPrint, setAnimating, startHeroPrint, startModelPrint } from "@/lib/sceneStore";
 import { GLBModel } from "./GLBModel";
 import { ModelErrorBoundary } from "./ModelErrorBoundary";
 import { PlaceholderModel } from "./PlaceholderModel";
@@ -107,14 +107,17 @@ interface PrintRevealProps {
   visible: boolean;
   /** Show the hotend riding the cut height. */
   hotend?: boolean;
+  /** Print again from the bottom on mount, even if an earlier model already printed. */
+  replay?: boolean;
 }
 
 /**
  * Builds the model bottom-up like a real print: a horizontal clipping plane
  * rises from the model's base to its top, with a molten edge at the cut.
- * Starts when the model is on screen and plays once per page load.
+ * Starts when the model is on screen and plays once per page load, or again
+ * on mount with `replay` (models that rotate in after the first).
  */
-export function PrintReveal({ children, visible, hotend = false }: PrintRevealProps) {
+export function PrintReveal({ children, visible, hotend = false, replay = false }: PrintRevealProps) {
   const key = useId();
   const content = useRef<THREE.Group>(null);
   const ring = useRef<THREE.Group>(null);
@@ -123,7 +126,7 @@ export function PrintReveal({ children, visible, hotend = false }: PrintRevealPr
   const plane = useMemo(() => new THREE.Plane(new THREE.Vector3(0, -1, 0), 0), []);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [finished, setFinished] = useState(
-    () => modelPrintStart.get() !== null && modelPrintProgress() >= 1,
+    () => !replay && modelPrintStart.get() !== null && modelPrintProgress() >= 1,
   );
   const clipped = useRef(false);
   const doneAt = useRef<number | null>(null);
@@ -141,7 +144,8 @@ export function PrintReveal({ children, visible, hotend = false }: PrintRevealPr
       clipped.current = true;
     }
     startHeroPrint();
-    startModelPrint();
+    if (replay) restartModelPrint();
+    else startModelPrint();
     return () => {
       if (!clipped.current) return;
       forEachMaterial(root, (m) => {

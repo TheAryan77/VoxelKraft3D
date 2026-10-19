@@ -8,12 +8,13 @@ import { PAYMENT_STATUS_LABEL } from "@/lib/shop/status";
 import { Card, Pill, StatusBadge } from "@/components/shop/ui";
 import { OrderTimeline } from "@/components/shop/OrderTimeline";
 import { OrderControls } from "./OrderControls";
+import { syncRazorpayPayment } from "@/lib/shop/payments";
 
 const date = new Intl.DateTimeFormat("en-IN", { day: "numeric", month: "short", year: "numeric", hour: "numeric", minute: "2-digit" });
 
 export default async function AdminOrder({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const order = await db.order.findUnique({
+  const load = () => db.order.findUnique({
     where: { id },
     include: {
       items: true,
@@ -22,7 +23,10 @@ export default async function AdminOrder({ params }: { params: Promise<{ id: str
       conversations: { select: { id: true, subject: true, adminUnread: true }, orderBy: { lastMessageAt: "desc" } },
     },
   });
+  let order = await load();
   if (!order) notFound();
+  // Catch up an online payment that never got confirmed back to us.
+  if (await syncRazorpayPayment(order)) order = (await load())!;
   const address = [order.shipLine1, order.shipLine2, order.shipCity, `${order.shipState} ${order.shipPincode}`].filter(Boolean).join(", ");
 
   return (
@@ -84,7 +88,7 @@ export default async function AdminOrder({ params }: { params: Promise<{ id: str
             <p className="text-text">{order.shipName}</p>
             <p className="text-text-muted">{address}</p>
             <a href={`tel:${order.shipPhone}`} className="text-molten underline-offset-4 hover:underline">{order.shipPhone}</a>
-            {order.customerNote && <p className="mt-3 rounded-[12px] border border-line p-3 text-text-muted">Customer note: {order.customerNote}</p>}
+            {order.customerNote && <p className="mt-3 rounded-[12px] border border-line p-3 text-text-muted"><span className="text-text">Customisation:</span> {order.customerNote}</p>}
           </Card>
           <Card className="flex flex-col gap-1 text-sm">
             <h2 className="mb-2 font-heading text-lg text-text">Customer</h2>

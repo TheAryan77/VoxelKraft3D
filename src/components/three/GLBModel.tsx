@@ -29,6 +29,47 @@ function applyRawFinish(material: THREE.Material, saturation: number) {
   m.needsUpdate = true;
 }
 
+const baked = new WeakSet<THREE.Object3D>();
+
+/**
+ * Rigged models (characters) render through their skeleton, but a wireframe
+ * drawn from the raw geometry would sit in the bind pose. Bakes each skinned
+ * mesh into a plain mesh in its current pose, once per loaded file, so the
+ * body, the wireframe, clipping and the auto-fit all agree.
+ */
+function bakeSkinnedMeshes(scene: THREE.Object3D) {
+  if (baked.has(scene)) return;
+  baked.add(scene);
+  scene.updateMatrixWorld(true);
+  const skinned: THREE.SkinnedMesh[] = [];
+  scene.traverse((o) => {
+    if ((o as THREE.SkinnedMesh).isSkinnedMesh) skinned.push(o as THREE.SkinnedMesh);
+  });
+  const v = new THREE.Vector3();
+  for (const mesh of skinned) {
+    mesh.skeleton.update();
+    const geometry = mesh.geometry.clone();
+    const pos = geometry.attributes.position;
+    for (let i = 0; i < pos.count; i++) {
+      v.fromBufferAttribute(pos, i);
+      mesh.applyBoneTransform(i, v);
+      pos.setXYZ(i, v.x, v.y, v.z);
+    }
+    geometry.deleteAttribute("skinIndex");
+    geometry.deleteAttribute("skinWeight");
+    geometry.computeVertexNormals();
+    geometry.computeBoundingBox();
+    geometry.computeBoundingSphere();
+    const plain = new THREE.Mesh(geometry, mesh.material);
+    plain.name = mesh.name;
+    plain.position.copy(mesh.position);
+    plain.quaternion.copy(mesh.quaternion);
+    plain.scale.copy(mesh.scale);
+    mesh.parent?.add(plain);
+    mesh.parent?.remove(mesh);
+  }
+}
+
 /**
  * Loads a .glb (Draco-compressed by default) and returns a private clone, so
  * per-slot changes such as print-reveal clipping never leak into other slots.
@@ -65,6 +106,7 @@ export function GLBModel({
   );
 
   const clone = useMemo(() => {
+    bakeSkinnedMeshes(scene);
     const root = scene.clone(true);
     const meshes: THREE.Mesh[] = [];
     root.traverse((o) => {

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { formatPrice } from "@/lib/shop/money";
+import { cn } from "@/lib/utils";
 
 export interface ProductCardData {
   slug: string;
@@ -8,12 +9,15 @@ export interface ProductCardData {
   price: number;
   compareAt: number | null;
   images: string[];
+  /** null = made to order. */
+  stock?: number | null;
   category?: { name: string } | null;
 }
 
 export function ProductCard({ product, priority }: { product: ProductCardData; priority?: boolean }) {
   const image = product.images[0];
-  const onSale = product.compareAt && product.compareAt > product.price;
+  const outOfStock = product.stock != null && product.stock <= 0;
+  const onSale = !outOfStock && product.compareAt && product.compareAt > product.price;
   return (
     <Link
       href={`/product/${product.slug}`}
@@ -27,10 +31,15 @@ export function ProductCard({ product, priority }: { product: ProductCardData; p
             fill
             priority={priority}
             sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
-            className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+            className={cn("object-cover transition-transform duration-500 group-hover:scale-[1.03]", outOfStock && "opacity-50 grayscale")}
           />
         ) : (
           <div className="layer-lines absolute inset-0 !h-full opacity-60" />
+        )}
+        {outOfStock && (
+          <span className="absolute left-2 top-2 rounded-full border border-line bg-bg/90 px-2 py-0.5 text-[10px] font-semibold text-text sm:left-3 sm:top-3 sm:text-xs">
+            Out of stock
+          </span>
         )}
         {onSale && (
           <span className="absolute left-2 top-2 rounded-full bg-molten px-2 py-0.5 text-[10px] font-semibold text-on-molten sm:left-3 sm:top-3 sm:text-xs">
@@ -41,7 +50,7 @@ export function ProductCard({ product, priority }: { product: ProductCardData; p
       <div className="flex flex-1 flex-col gap-1 p-3 sm:p-4">
         {product.category && <p className="text-[11px] text-text-muted sm:text-xs">{product.category.name}</p>}
         <h3 className="font-heading text-sm leading-snug text-text sm:text-base">{product.name}</h3>
-        <p className="mt-auto flex items-baseline gap-2 pt-1 font-machine text-sm text-text">
+        <p className={cn("mt-auto flex items-baseline gap-2 pt-1 font-machine text-sm", outOfStock ? "text-text-muted" : "text-text")}>
           {formatPrice(product.price)}
           {onSale && <span className="text-xs text-text-muted line-through">{formatPrice(product.compareAt!)}</span>}
         </p>

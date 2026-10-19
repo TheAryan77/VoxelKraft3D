@@ -66,6 +66,11 @@ export function startModelPrint() {
   modelPrintStart.set(prefersReducedMotion() ? -Infinity : performance.now());
 }
 
+/** Starts the print clock again, for the next model in the hero rotation. */
+export function restartModelPrint() {
+  modelPrintStart.set(prefersReducedMotion() ? -Infinity : performance.now());
+}
+
 /** Gentle ease-out so layers keep stacking visibly right up to the top. */
 const easeOutQuad = (t: number) => 1 - (1 - t) * (1 - t);
 

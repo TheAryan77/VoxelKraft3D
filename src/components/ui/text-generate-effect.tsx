@@ -2,8 +2,10 @@
 // Aceternity UI — Text Generate Effect, restyled: muted body text, words
 // sharpen in one after another. Renders statically under reduced motion.
 import { useEffect } from "react";
-import { motion, stagger, useAnimate, useReducedMotion } from "motion/react";
+import { motion, stagger, useAnimate } from "motion/react";
 import { cn } from "@/lib/utils";
+// The project's hook, not motion's: it matches the server render first, so hydration is clean.
+import { useReducedMotion } from "@/lib/useReducedMotion";
 
 export const TextGenerateEffect = ({
   words,
